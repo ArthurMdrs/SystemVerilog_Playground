@@ -1,0 +1,5 @@
+This module is an implementation of the Finite-State Machine used to control the Ford Thunderbird tail lights.
+
+There is also a scoreboard module that uses an associative array to keep track of how many times each state happens.
+
+To run a simulation, make sure to include T_bird_tail_light_FSM_pkg.sv before T_bird_tail_light_FSM.sv and scoreboard.sv.

@@ -1,0 +1,6 @@
+This module is an combinational adder for numbers in the floating-point format, along with a testbench. There is also a package, where you will find the struct that defines the fields of the format used. The local parameters in the package are used in both the module and the testbench, so you can change them to quickly customize everything.
+The current configuration of the parameters is equivalent to the IEEE double-precision format. In this module, rounding methods are not implemented and denormalized numbers are not handled.
+
+Suggestion of improvement: make a better checkit function!. The checkit function in the testbench that implements a reference model uses real numbers to calculate the results. The simulator real number operations use rounding methods and denormalized numbers, making the results different than the DUT outputs, and also limit our customized format to 64 bits.
+
+To run a simulation, make sure to include count_leading_zeros.sv and floating_point_pkg.sv before floating_point_adder.sv.

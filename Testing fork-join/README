@@ -1,0 +1,1 @@
+This is a simple code to test SystemVerilog different types of fork-join. We have regular join, join_none and join_any.

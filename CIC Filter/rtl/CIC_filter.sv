@@ -26,6 +26,10 @@ logic [REGS_WIDTH-1:0] comb_in   [STAGES];
 logic [REGS_WIDTH-1:0] comb_out  [STAGES];
 logic [REGS_WIDTH-1:0] decim_out;
 
+
+logic integ_of_vec [STAGES];
+logic comb_of_vec  [STAGES];
+
 // Clock generation
 logic [$clog2(RATE/2):0] cnt;
 logic clk_slow;
@@ -42,7 +46,7 @@ always_ff @(posedge clk or negedge rstn) begin
     end
 end
 
-
+// Generate filter stages
 generate
     genvar i;
     for (i = 0; i < STAGES; i++) begin
@@ -50,7 +54,7 @@ generate
             .WIDTH(REGS_WIDTH)
         ) integrator_inst (
             .a(integ_out[i]),
-            .overflow(),
+            .overflow(integ_of_vec[i]),
             .x(integ_in[i]),
             .clk(clk),
             .rstn(rstn)
@@ -61,7 +65,7 @@ generate
             .N_DELAYS(1)
         ) comb_inst (
             .y(comb_out[i]),
-            .overflow(),
+            .overflow(comb_of_vec[i]),
             .a(comb_in[i]),
             .clk(clk_slow),
             .rstn(rstn)
@@ -69,7 +73,7 @@ generate
 
         if (i > 0) begin
             assign integ_in[i] = integ_out[i-1];
-            assign comb_in[i]  = comb_out[i-1] ;
+            assign  comb_in[i] =  comb_out[i-1];
         end
     end    
 endgenerate
@@ -88,10 +92,15 @@ decimator #(
 assign integ_in[0] = {{(REGS_WIDTH-WIDTH){1'b0}}, in};
 
 
+
 assign out = comb_out[STAGES-1] >> $clog2(RATE);
+// assign out = comb_out[STAGES-1] >> ($clog2(RATE*STAGES - 1));
+// assign out = comb_out[STAGES-1] / RATE;
 // assign out = comb_out[STAGES-1];
 
 
+
+// `define SVA_ENABLE
 
 `ifdef SVA_ENABLE
 

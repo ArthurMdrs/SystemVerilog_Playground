@@ -41,7 +41,7 @@ property SIGNAL_IS_POWER_OF_2 (signal);
 endproperty
 
 // Assertions
-AST_SIGNAL_IS_POWER_OF_2: assert property (SIGNAL_IS_POWER_OF_2);
+AST_SIGNAL_IS_POWER_OF_2: assert property (SIGNAL_IS_POWER_OF_2(RATE));
 
 // Covers
 COV_OUTPUT_CAN_BE_3: cover property (SIGNAL_CAN_BE_VALUE(out, 3));

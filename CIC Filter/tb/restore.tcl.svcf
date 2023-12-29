@@ -1,0 +1,143 @@
+# SimVision Command Script (Fri Dec 29 15:26:33 -03 2023)
+#
+# Version 23.09.s003
+#
+# You can restore this configuration with:
+#
+#      xrun -64bit -sv ./CIC_filter_tb.sv ./CIC_filter_vc.sv ./comb_vc.sv ./decimator_vc.sv ./integrator_vc.sv ../rtl/CIC_filter.sv ../rtl/comb.sv ../rtl/decimator.sv ../rtl/integrator.sv -top CIC_filter_tb -timescale 1ns/1ns -access +rwc +SVSEED=random -input restore.tcl
+#
+
+
+#
+# Preferences
+#
+preferences set plugin-enable-svdatabrowser-new 1
+preferences set plugin-enable-groupscope 0
+preferences set plugin-enable-interleaveandcompare 0
+preferences set plugin-enable-waveformfrequencyplot 0
+
+#
+# Simulator
+#
+database require simulator -hints {
+	simulator "xrun -64bit -sv ./CIC_filter_tb.sv ./CIC_filter_vc.sv ./comb_vc.sv ./decimator_vc.sv ./integrator_vc.sv ../rtl/CIC_filter.sv ../rtl/comb.sv ../rtl/decimator.sv ../rtl/integrator.sv -top CIC_filter_tb -timescale 1ns/1ns -access +rwc +SVSEED=random -gui -input restore.tcl"
+}
+
+#
+# Mnemonic Maps
+#
+mmap new  -reuse -name {Boolean as Logic} -radix %b -contents {{%c=FALSE -edgepriority 1 -shape low}
+{%c=TRUE -edgepriority 1 -shape high}}
+mmap new  -reuse -name {Example Map} -radix %x -contents {{%b=11???? -bgcolor orange -label REG:%x -linecolor yellow -shape bus}
+{%x=1F -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=2C -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=* -label %x -linecolor gray -shape bus}}
+
+#
+# Design Browser windows
+#
+if {[catch {window new WatchList -name "Design Browser 1" -geometry 730x947+49+27}] != ""} {
+    window geometry "Design Browser 1" 730x947+49+27
+}
+window target "Design Browser 1" on
+browser using {Design Browser 1}
+browser set -scope [subst  {simulator::[format {CIC_filter_tb.CIC_filter_inst}]} ]
+browser set \
+    -signalsort name
+browser yview see [subst  {simulator::[format {CIC_filter_tb.CIC_filter_inst}]} ]
+browser timecontrol set -lock 0
+
+#
+# Waveform windows
+#
+if {[catch {window new WaveWindow -name "Waveform 1" -geometry 1871x958+49+27}] != ""} {
+    window geometry "Waveform 1" 1871x958+49+27
+}
+window target "Waveform 1" on
+waveform using {Waveform 1}
+waveform sidebar visibility partial
+waveform set \
+    -primarycursor TimeA \
+    -signalnames name \
+    -signalwidth 175 \
+    -units ns \
+    -valuewidth 75
+waveform baseline set -time 0
+
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.in[7:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[0].integrator_inst.x[15:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[0].integrator_inst.a[15:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[1].integrator_inst.x[15:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[1].integrator_inst.a[15:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[2].integrator_inst.x[15:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[2].integrator_inst.a[15:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[3].integrator_inst.x[15:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[3].integrator_inst.a[15:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.decimator_inst.in[15:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.decimator_inst.out[15:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[0].comb_inst.a[15:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[0].comb_inst.y[15:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[1].comb_inst.a[15:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[1].comb_inst.y[15:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[2].comb_inst.a[15:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[2].comb_inst.y[15:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[3].comb_inst.a[15:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[3].comb_inst.y[15:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.CIC_filter_inst.out[7:0]}]}
+	} ]]
+
+waveform xview limits 0 59ns
+
+#
+# Waveform Window Links
+#
+
+#
+# Console windows
+#
+console set -windowname Console
+window geometry Console 730x250+261+564
+
+#
+# Layout selection
+#
+

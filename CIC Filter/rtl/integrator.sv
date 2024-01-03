@@ -14,16 +14,26 @@ module integrator #(
     input  logic             rstn
 );
 
-// Declaration of delaye stage
-logic [WIDTH-1:0] delayed;
+// // Declaration of delaye stage
+// logic [WIDTH-1:0] delayed;
 
-// Drive delayed stage
-always_ff @(posedge clk or negedge rstn) begin
-    if (!rstn)
-        delayed <= 0;
-    else
-        delayed <= a;
-end
+// // Drive delayed stage
+// always_ff @(posedge clk or negedge rstn) begin
+//     if (!rstn)
+//         delayed <= 0;
+//     else
+//         delayed <= a;
+// end
+
+// // Drive outputs
+// always_ff @(posedge clk or negedge rstn) begin
+//     if (!rstn) begin
+//         a <= 0;
+//         overflow <= 0;
+//     end else begin
+//         {overflow, a} <= x + delayed;
+//     end
+// end
 
 // Drive outputs
 always_ff @(posedge clk or negedge rstn) begin
@@ -31,24 +41,23 @@ always_ff @(posedge clk or negedge rstn) begin
         a <= 0;
         overflow <= 0;
     end else begin
-        {overflow, a} <= x + delayed;
+        {overflow, a} <= x + a;
     end
 end
 
 
 
-`ifdef SVA_ENABLE
+`ifdef SVA_SMLBLK
 
 bind integrator integrator_vc #(
     .WIDTH(WIDTH)
 ) integrator_vc_inst (
-// ) (
     .a,
     .overflow,
     .x,
     .clk,
-    .rstn,
-    .delayed
+    .rstn
+    // .delayed
 );
 
 `endif

@@ -43,13 +43,12 @@ end
 
 
 
-`ifdef SVA_ENABLE
+`ifdef SVA_SMLBLK
 
 bind comb comb_vc #(
     .WIDTH(WIDTH),
     .N_DELAYS(N_DELAYS)
 ) comb_vc_inst (
-// ) (
     .y,
     .overflow,
     .a,

@@ -1,5 +1,6 @@
-# SVA = +define+SVA_ENABLE=1
-SVA = 
+# SVA = +define+SVA_SMLBLK=1
+SVA = +define+SVA_BIGBLK=1
+# SVA = 
 
 RTL = ../rtl/*.sv
 VERIF = ./*.sv
@@ -12,12 +13,12 @@ GUI =
 # JG_MODE = -xprop
 # JG_MODE = -superlint
 
-# JG_SCRIPT = jg_comb.tcl
-# JG_SCRIPT = jg_integrator.tcl
-# JG_SCRIPT = jg_decimator.tcl
-JG_SCRIPT = jg_CIC_filter.tcl
+# JG_SCRIPT = tcl/jg_comb.tcl
+# JG_SCRIPT = tcl/jg_integrator.tcl
+# JG_SCRIPT = tcl/jg_decimator.tcl
+JG_SCRIPT = tcl/jg_CIC_filter.tcl
 
-SEED = random
+SEED = 1
 
 run: genwave sim plot
 

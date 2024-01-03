@@ -57,13 +57,12 @@ end
 
 
 
-`ifdef SVA_ENABLE
+`ifdef SVA_SMLBLK
 
 bind decimator decimator_vc #(
     .WIDTH(WIDTH), 
     .DEC_RATE(DEC_RATE)
 ) decimator_vc_inst (
-// ) (
     .out,
     .in,
     .clk,

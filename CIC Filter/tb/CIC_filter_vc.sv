@@ -6,7 +6,7 @@
 module CIC_filter_vc #(
     int WIDTH = 1,
     int STAGES = 1,
-    int RATE = 4 // must be power of 2
+    int RATE = 4 // must be power of 2 and at least 2
 ) (
     input  logic [WIDTH-1:0] out,
     input  logic [WIDTH-1:0] in,
@@ -14,7 +14,7 @@ module CIC_filter_vc #(
     input  logic             rstn
 );
 
-`ifdef SVA_ENABLE
+`ifdef SVA_BIGBLK
 
 // Defaults
 default clocking def_clk @(posedge clk); 
@@ -40,8 +40,13 @@ property SIGNAL_IS_POWER_OF_2 (signal);
     ($onehot(signal));
 endproperty
 
+property SIGNAL_IS_AT_LEAST_2 (signal);
+    (signal >= 2);
+endproperty
+
 // Assertions
-AST_SIGNAL_IS_POWER_OF_2: assert property (SIGNAL_IS_POWER_OF_2(RATE));
+AST_RATE_IS_POWER_OF_2: assert property (SIGNAL_IS_POWER_OF_2(RATE));
+AST_RATE_IS_AT_LEAST_2: assert property (SIGNAL_IS_AT_LEAST_2(RATE));
 
 // Covers
 COV_OUTPUT_CAN_BE_3: cover property (SIGNAL_CAN_BE_VALUE(out, 3));

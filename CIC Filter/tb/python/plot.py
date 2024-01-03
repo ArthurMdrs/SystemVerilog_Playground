@@ -4,36 +4,55 @@ import random
 
 from definitions import *
 
-# Define t vector
-t = np.arange(t_start, t_end, Ts)
-
-x_in = []
-y_out =[]
+# Read input file
+in_vec = []
 with open("input.txt") as input_file:
     for i in input_file:
-        x_in.append(int(i))
+        in_vec.append(int(i))
 
+# Read output file
+out_vec =[]
 with open("output.txt") as output_file:
     try:
         for i in output_file:
-            y_out.append((int(i)))
+            out_vec.append(int(i))
     except ValueError:
-        print("tratament")
+        print("Error")
 
+# Define time vectors
+Ts = (t_end-t_start)/len(in_vec)
+t1 = np.arange(t_start, t_end, Ts)
+diff = len(out_vec) - len(in_vec)
+t2 = np.arange(t_start, (t_end + diff*Ts), Ts)
+
+# Plots
 plt.figure(1, figsize=(18,9))
 # plt.suptitle("Before and after CIC filter", size="x-large")
 plt.subplot(3,1,1)
 plt.title("Before CIC filter")
-plt.stem(t, x_in)
+plt.stem(t1, in_vec)
+plt.xlabel("Time")
+plt.ylabel("Amplitude")
+plt.grid(visible=True, which="both")
+
 plt.subplot(3,1,2)
 plt.title("After CIC filter")
-plt.stem(t, y_out, 'r', markerfmt = 'ro')
+plt.stem(t2, out_vec, 'r', markerfmt = 'ro')
+plt.xlabel("Time")
+plt.ylabel("Amplitude")
+plt.grid(visible=True, which="both")
+
 plt.subplot(3,1,3)
 plt.title("Comparison")
-plt.stem(t, x_in)
-plt.stem(t, y_out, 'r', markerfmt = 'ro')
+plt.stem(t1, in_vec)
+plt.stem(t2, out_vec, 'r', markerfmt = 'ro')
+plt.legend(["Original", "Filtered"])
+plt.xlabel("Time")
+plt.ylabel("Amplitude")
+plt.grid(visible=True, which="both")
+
 plt.tight_layout()
 # plt.savefig("my_fig.png")
-plt.savefig(wave_type+".png")
+plt.savefig("png/"+wave_type+".png")
 plt.show()
 

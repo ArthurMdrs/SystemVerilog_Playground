@@ -16,11 +16,11 @@ t_end = 3/f0 # s
 
 # Select type of waveform
 options = ["sum_of_harmonics", "sine", "impulse"]
-wave_type = options[0]
+wave_type = options[2]
 
 def generate_wave(wave_type="sum_of_harmonics", t=0):
     wave_out = np.zeros(len(t))
-    A_max = 20
+    A_max = 260/2
 
     if (wave_type == "sum_of_harmonics"):
         for i in range(1, max_harmonic+1):
@@ -30,7 +30,7 @@ def generate_wave(wave_type="sum_of_harmonics", t=0):
             wave_out += A * np.sin(i*w0*t + theta)
     
     if (wave_type == "sine"):
-        theta = 0
+        theta = random.random() * 2*np.pi
         wave_out = A_max * np.sin(w0*t + theta)
 
     if (wave_type == "impulse"):

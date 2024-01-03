@@ -14,7 +14,7 @@ module decimator_vc #(
     input logic             clk_slow
 );
 
-`ifdef SVA_ENABLE
+`ifdef SVA_SMLBLK
 
 // Defaults
 default clocking def_clk @(posedge clk); 

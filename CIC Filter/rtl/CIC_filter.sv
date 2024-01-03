@@ -9,7 +9,7 @@
 module CIC_filter #(
     int WIDTH = 1,
     int STAGES = 1,
-    int RATE = 4 // must be power of 2
+    int RATE = 4 // must be power of 2 and at least 2
 ) (
     output logic [WIDTH-1:0] out,
     input  logic [WIDTH-1:0] in,
@@ -93,16 +93,12 @@ assign integ_in[0] = {{(REGS_WIDTH-WIDTH){1'b0}}, in};
 
 
 
-assign out = comb_out[STAGES-1] >> $clog2(RATE);
-// assign out = comb_out[STAGES-1] >> ($clog2(RATE*STAGES - 1));
-// assign out = comb_out[STAGES-1] / RATE;
-// assign out = comb_out[STAGES-1];
+// assign out = comb_out[STAGES-1] >> $clog2(RATE);
+assign out = comb_out[STAGES-1] >> ($clog2(RATE**STAGES));
 
 
 
-// `define SVA_ENABLE
-
-`ifdef SVA_ENABLE
+`ifdef SVA_BIGBLK
 
 bind CIC_filter CIC_filter_vc #(
     .WIDTH(WIDTH),
@@ -114,6 +110,40 @@ bind CIC_filter CIC_filter_vc #(
     .in,
     .clk,
     .rstn
+);
+
+bind decimator decimator_vc #(
+    .WIDTH(WIDTH), 
+    .DEC_RATE(DEC_RATE)
+) decimator_vc_inst (
+    .out,
+    .in,
+    .clk,
+    .rstn,
+    .clk_slow
+);
+
+bind integrator integrator_vc #(
+    .WIDTH(WIDTH)
+) integrator_vc_inst (
+    .a,
+    .overflow,
+    .x,
+    .clk,
+    .rstn
+    // .delayed
+);
+
+bind comb comb_vc #(
+    .WIDTH(WIDTH),
+    .N_DELAYS(N_DELAYS)
+) comb_vc_inst (
+    .y,
+    .overflow,
+    .a,
+    .clk,
+    .rstn,
+    .delayed
 );
 
 `endif

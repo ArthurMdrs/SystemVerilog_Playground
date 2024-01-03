@@ -31,6 +31,11 @@ wave_out = generate_wave(wave_type, t)
 # Shift the wave up so we don't get negative values
 wave_out -= min(wave_out)
 
+# Make sure result fits in 8 bits
+for i in range(len(wave_out)):
+    if wave_out[i] > 255:
+        wave_out[i] = 255
+
 wave_out_int = []
 input_file = open("input.txt", "w")
 for i in wave_out:

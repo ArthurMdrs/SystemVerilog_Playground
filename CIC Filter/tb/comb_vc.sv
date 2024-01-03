@@ -15,7 +15,7 @@ module comb_vc #(
     input logic [WIDTH-1:0] delayed [N_DELAYS]
 );
 
-`ifdef SVA_ENABLE
+`ifdef SVA_SMLBLK
 
 // Defaults
 default clocking def_clk @(posedge clk); 

@@ -1,12 +1,12 @@
 clear -all
 
-analyze -sv12 +define+SVA_ENABLE=1 \
+analyze -sv12 +define+SVA_BIGBLK=1 \
+    ./CIC_filter_vc.sv \
     ../rtl/CIC_filter.sv \
     ../rtl/comb.sv \
     ../rtl/decimator.sv \
     ../rtl/integrator.sv
-analyze -sv12 +define+SVA_ENABLE=1 \
-    ./CIC_filter_vc.sv \
+analyze -sv12 +define+SVA_SMLBLK=1 \
     ./comb_vc.sv \
     ./decimator_vc.sv \
     ./integrator_vc.sv
@@ -19,5 +19,5 @@ reset !rstn
 #reset -none
 #assume -reset !rstn
 
-#prove -all
-prove -bg -property {<embedded>::CIC_filter.CIC_filter_vc_inst.COV_OUTPUT_CAN_BE_3}
+prove -all
+#prove -bg -property {<embedded>::CIC_filter.CIC_filter_vc_inst.COV_OUTPUT_CAN_BE_3}

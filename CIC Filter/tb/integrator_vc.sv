@@ -10,11 +10,11 @@ module integrator_vc #(
     input logic             overflow,
     input logic [WIDTH-1:0] x,
     input logic             clk,
-    input logic             rstn,
-    input logic [WIDTH-1:0] delayed
+    input logic             rstn
+    // input logic [WIDTH-1:0] delayed
 );
 
-`ifdef SVA_ENABLE
+`ifdef SVA_SMLBLK
 
 // Defaults
 default clocking def_clk @(posedge clk); 
@@ -33,12 +33,12 @@ always_ff @(posedge clk or negedge rstn) begin
 end
 
 // Properties
-property PROPER_DELAY (delayed, in, n_delays);
-    (delays_waited >= n_delays) |-> (delayed == $past(in, n_delays));
-endproperty
+// property PROPER_DELAY (delayed, in, n_delays);
+//     (delays_waited >= n_delays) |-> (delayed == $past(in, n_delays));
+// endproperty
 
 property VALID_OUTPUT (out, in1, in2, n_delays, overflow);
-    (delays_waited  > n_delays) |-> (out == $past(in1) + $past(in2, n_delays+1)) || (overflow);
+    (delays_waited  > n_delays) |-> (out == $past(in1) + $past(in2)) || (overflow);
 endproperty
 
 property SIGNAL_RESETS (signal, rst_val);
@@ -47,7 +47,7 @@ property SIGNAL_RESETS (signal, rst_val);
 endproperty
 
 // Assertions
-AST_PROPER_DELAY: assert property (PROPER_DELAY(delayed, a, N_DELAYS));
+// AST_PROPER_DELAY: assert property (PROPER_DELAY(delayed, a, N_DELAYS));
 AST_VALID_OUTPUT: assert property (VALID_OUTPUT(a, x, a, N_DELAYS, overflow));
 AST_A_RESETS: assert property (SIGNAL_RESETS(a, 0));
 AST_OVERFLOW_RESETS: assert property (SIGNAL_RESETS(overflow, 0));

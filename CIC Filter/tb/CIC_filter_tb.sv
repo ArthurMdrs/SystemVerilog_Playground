@@ -3,9 +3,10 @@ typedef enum bit {FROM_TXT_FILE, FROM_RNG} input_mode_t;
 module CIC_filter_tb;
 
     // DUT parameters
-    localparam int WIDTH = 8;
-    localparam int STAGES = 1;
-    localparam int RATE = 4;
+    // localparam int WIDTH = 8;
+    // localparam int STAGES = 1;
+    // localparam int RATE = 4;
+    `include "params.sv"
 
     // DUT ports
     logic [WIDTH-1:0] out;
@@ -108,6 +109,13 @@ module CIC_filter_tb;
         $timeformat(-9, 0, " ns", 6);
 
         $display("#==========================================================#");
+
+        if (verbose) begin
+            $display("Parameter WIDTH is %0d", WIDTH);
+            $display("Parameter STAGES is %0d", STAGES);
+            $display("Parameter RATE is %0d", RATE);
+        end
+
         // Compute expected latency between full set of inputs and corresponding output
         expected_latency = compute_expected_latency(STAGES);
 

@@ -17,9 +17,10 @@ module CIC_filter #(
     input  logic             rstn
 );
 
+// Create adequate width for datapath registers
 localparam int REGS_WIDTH = WIDTH + (STAGES * $clog2(RATE));
 
-
+// Create inputs and outputs for combs and integrators
 logic [REGS_WIDTH-1:0] integ_in  [STAGES];
 logic [REGS_WIDTH-1:0] integ_out [STAGES];
 logic [REGS_WIDTH-1:0] comb_in   [STAGES];
@@ -31,8 +32,11 @@ logic integ_of_vec [STAGES];
 logic comb_of_vec  [STAGES];
 
 // Clock generation
+// Fast freq = system freq, slow freq = fast freq / RATE
 logic [$clog2(RATE/2):0] cnt;
-logic clk_slow;
+logic clk_slow, clk_fast;
+
+assign clk_fast = clk;
 
 always_ff @(posedge clk or negedge rstn) begin
     if (!rstn) begin

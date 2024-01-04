@@ -1,8 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+import sys
 
 from definitions import *
+
+# Read command line args
+n_args = len(sys.argv)
+if n_args == 3:
+    stages = sys.argv[1]
+    rate = sys.argv[2]
+    # print(stages, " stages, ", "rate = ", rate)
 
 # Read input file
 in_vec = []
@@ -53,6 +61,9 @@ plt.grid(visible=True, which="both")
 
 plt.tight_layout()
 # plt.savefig("my_fig.png")
-plt.savefig("png/"+wave_type+".png")
-plt.show()
+if n_args == 3:
+    plt.savefig("png/"+wave_type+"_ST="+stages+"_RT="+rate+".png")
+else:
+    plt.savefig("png/"+wave_type+".png")
+# plt.show()
 

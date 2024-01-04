@@ -15,8 +15,8 @@ t_start = 0 # s
 t_end = 3/f0 # s
 
 # Select type of waveform
-options = ["sum_of_harmonics", "sine", "impulse"]
-wave_type = options[2]
+options = ["sum_hmncs", "sine", "impulse"]
+wave_type = options[0]
 
 def generate_wave(wave_type="sum_of_harmonics", t=0):
     wave_out = np.zeros(len(t))

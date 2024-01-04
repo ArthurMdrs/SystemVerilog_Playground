@@ -36,5 +36,22 @@ formal:
 	jg $(JG_MODE) $(JG_SCRIPT)
 
 clean:
-	rm -rf xcelium.d INCA_libs xrun.* *.shm *.dsn *.trn *.ucm ncvlog_*.err imc.key .simvision *.log *.diag *.so jgproject python/__pycache__
-	rm -r  mapped* rc* fv libscore_work script
+	rm -rf xcelium.d INCA_libs xrun.* *.shm *.dsn *.trn *.ucm ncvlog_*.err imc.key .simvision jgproject python/__pycache__
+	rm -r  mapped* rc* fv libscore_work script *.log *.history log/* png/* *.diag *.so 
+
+many: 
+	@for i in 1 2 3 4 5 6 ; do \
+		for j in 2 4 8; do \
+			# echo $${i}; \
+			# cp xrun.log logs/$${i}.log; \
+			echo "localparam int WIDTH = 8;" > params.sv; \
+			echo "localparam int STAGES = $${i};" >> params.sv; \
+			echo "localparam int RATE = $${j};" >> params.sv; \
+			xrun -64bit -sv $(VERIF) $(RTL) $(SVA) $(TOP) \
+				-timescale 1ns/1ns -access +rwc +SVSEED=$(SEED) $(GUI) \
+				-l logS$${i}R$${j}.log; \
+			python3 python/plot.py $${i} $${j}; \
+		done \
+	done
+	@mv -f *.log ./log/
+	@mv -f *.history ./log/

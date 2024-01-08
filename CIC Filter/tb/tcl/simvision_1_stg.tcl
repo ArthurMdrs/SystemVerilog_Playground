@@ -5,7 +5,7 @@
 #
 # You can restore this configuration with:
 #
-#      xrun -64bit -sv ./CIC_filter_tb.sv ./CIC_filter_vc.sv ./comb_vc.sv ./decimator_vc.sv ./integrator_vc.sv ../rtl/CIC_filter.sv ../rtl/comb.sv ../rtl/decimator.sv ../rtl/integrator.sv +define+SVA_BIGBLK=1 -top CIC_filter_tb -timescale 1ns/1ns -access +rwc +SVSEED=random -s -input /home/pedro.medeiros/SystemVerilog_Playground/CIC Filter/tb/tcl/simvision_2_stgs.tcl
+#      xrun -64bit -sv ./CIC_filter_tb.sv ./CIC_filter_vc.sv ./comb_vc.sv ./decim_or_interp_vc.sv ./decimator_vc.sv ./integrator_vc.sv ./params.sv ../rtl/CIC_filter.sv ../rtl/comb.sv ../rtl/decim_or_interp.sv ../rtl/decimator.sv ../rtl/integrator.sv +define+SVA_BIGBLK=1 -top CIC_filter_tb -timescale 1ns/1ns -access +rwc +SVSEED=1 -s -input /home/pedro.medeiros/SystemVerilog_Playground/CIC Filter/tb/tcl/simvision_1_stg.tcl
 #
 
 set tcl_prompt1 {puts -nonewline "xcelium> "}
@@ -44,7 +44,7 @@ set probe_exclude_patterns {}
 set probe_packed_limit 4k
 set probe_unpacked_limit 16k
 set assert_internal_msg no
-set svseed -1588351762
+set svseed 1
 set assert_reporting_mode 0
 set vcd_compact_mode 0
 set vhdl_forgen_loopindex_enum_pos 0
@@ -52,6 +52,7 @@ alias . run
 alias indago verisium
 alias quit exit
 database -open -shm -into waves.shm waves -default
-probe -create -database waves CIC_filter_tb.clk CIC_filter_tb.in CIC_filter_tb.CIC_filter_inst.genblk1[0].integrator_inst.x[9:0] CIC_filter_tb.CIC_filter_inst.genblk1[0].integrator_inst.a[9:0] CIC_filter_tb.CIC_filter_inst.genblk1[1].integrator_inst.x CIC_filter_tb.CIC_filter_inst.genblk1[1].integrator_inst.a CIC_filter_tb.CIC_filter_inst.decimator_inst.in[9:0] CIC_filter_tb.CIC_filter_inst.decimator_inst.out[9:0] CIC_filter_tb.CIC_filter_inst.genblk1[0].comb_inst.a[9:0] CIC_filter_tb.CIC_filter_inst.genblk1[0].comb_inst.y[9:0] CIC_filter_tb.CIC_filter_inst.genblk1[1].comb_inst.a CIC_filter_tb.CIC_filter_inst.genblk1[1].comb_inst.y CIC_filter_tb.out CIC_filter_tb.last_samples CIC_filter_tb.accum CIC_filter_tb.last_sum CIC_filter_tb.last_avg CIC_filter_tb.my_cnt
+probe -create -database waves CIC_filter_tb.fast_clk CIC_filter_tb.slow_clk CIC_filter_tb.in CIC_filter_tb.CIC_filter_inst.genblk1[0].integrator_inst.x CIC_filter_tb.CIC_filter_inst.genblk1[0].integrator_inst.a CIC_filter_tb.CIC_filter_inst.decim_or_interp_inst.in CIC_filter_tb.CIC_filter_inst.decim_or_interp_inst.out CIC_filter_tb.CIC_filter_inst.genblk1[0].comb_inst.a CIC_filter_tb.CIC_filter_inst.genblk1[0].comb_inst.y CIC_filter_tb.out CIC_filter_tb.last_samples CIC_filter_tb.accum CIC_filter_tb.last_sum CIC_filter_tb.last_avg CIC_filter_tb.out_cnt
+probe -create -database waves CIC_filter_tb.CIC_filter_inst.clk_fast CIC_filter_tb.CIC_filter_inst.clk_slow
 
-simvision -input simvision_2_stgs.tcl.svcf
+simvision -input simvision_1_stg.tcl.svcf

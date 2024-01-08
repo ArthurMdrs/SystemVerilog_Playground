@@ -11,7 +11,9 @@ module CIC_filter_vc #(
     input  logic [WIDTH-1:0] out,
     input  logic [WIDTH-1:0] in,
     input  logic             clk,
-    input  logic             rstn
+    input  logic             rstn,
+    input  logic             clk_fast,
+    input  logic             clk_slow
 );
 
 `ifdef SVA_BIGBLK
@@ -44,9 +46,15 @@ property SIGNAL_IS_AT_LEAST_2 (signal);
     (signal >= 2);
 endproperty
 
+property CLK_RELATION (clk_fast, clk_slow, rate);
+    // @(posedge clk_fast)
+    ($rose(clk_slow)) |=>  $stable(clk_slow)[*(rate/2-1)];
+endproperty
+
 // Assertions
 AST_RATE_IS_POWER_OF_2: assert property (SIGNAL_IS_POWER_OF_2(RATE));
 AST_RATE_IS_AT_LEAST_2: assert property (SIGNAL_IS_AT_LEAST_2(RATE));
+AST_CLK_RELATION: assert property (CLK_RELATION(clk_fast, clk_slow, RATE));
 
 // Covers
 COV_OUTPUT_CAN_BE_3: cover property (SIGNAL_CAN_BE_VALUE(out, 3));

@@ -1,0 +1,233 @@
+# SimVision Command Script (Mon Jan 08 11:50:46 -03 2024)
+#
+# Version 23.09.s003
+#
+# You can restore this configuration with:
+#
+#      xrun -64bit -sv ./CIC_filter_tb.sv ./CIC_filter_vc.sv ./comb_vc.sv ./decim_or_interp_vc.sv ./decimator_vc.sv ./integrator_vc.sv ./params.sv ../rtl/CIC_filter.sv ../rtl/comb.sv ../rtl/decim_or_interp.sv ../rtl/decimator.sv ../rtl/integrator.sv +define+SVA_BIGBLK=1 -top CIC_filter_tb -timescale 1ns/1ns -access +rwc +SVSEED=1 -s -input /home/pedro.medeiros/SystemVerilog_Playground/CIC Filter/tb/tcl/simvision_1_stg.tcl
+#
+
+
+#
+# Preferences
+#
+preferences set plugin-enable-svdatabrowser-new 1
+preferences set plugin-enable-groupscope 0
+preferences set plugin-enable-interleaveandcompare 0
+preferences set plugin-enable-waveformfrequencyplot 0
+
+#
+# Simulator
+#
+database require simulator -hints {
+	simulator "xrun -64bit -sv ./CIC_filter_tb.sv ./CIC_filter_vc.sv ./comb_vc.sv ./decim_or_interp_vc.sv ./decimator_vc.sv ./integrator_vc.sv ./params.sv ../rtl/CIC_filter.sv ../rtl/comb.sv ../rtl/decim_or_interp.sv ../rtl/decimator.sv ../rtl/integrator.sv +define+SVA_BIGBLK=1 -top CIC_filter_tb -timescale 1ns/1ns -access +rwc +SVSEED=1 -gui -s -input simvision_1_stg.tcl"
+}
+#
+# Groups
+#
+catch {group new -name {TB clks} -overlay 0}
+catch {group new -name {DUT clks} -overlay 0}
+catch {group new -name Comb0 -overlay 0}
+catch {group new -name Decim/Interp -overlay 0}
+catch {group new -name Integ0 -overlay 0}
+catch {group new -name {Debug vars} -overlay 0}
+group using {TB clks}
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+
+group insert \
+    [subst  {simulator::[format {CIC_filter_tb.slow_clk}]} ] \
+    [subst  {simulator::[format {CIC_filter_tb.fast_clk}]} ]
+group using {DUT clks}
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+
+group insert \
+    [subst  {simulator::[format {CIC_filter_tb.CIC_filter_inst.clk_fast}]} ] \
+    [subst  {simulator::[format {CIC_filter_tb.CIC_filter_inst.clk_slow}]} ]
+group using Comb0
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+
+group insert \
+    [subst  {simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[0].comb_inst.a[9:0]}]} ] \
+    [subst  {simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[0].comb_inst.y[9:0]}]} ]
+group using Decim/Interp
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+
+group insert \
+    [subst  {simulator::[format {CIC_filter_tb.CIC_filter_inst.decim_or_interp_inst.in[9:0]}]} ] \
+    [subst  {simulator::[format {CIC_filter_tb.CIC_filter_inst.decim_or_interp_inst.out[9:0]}]} ]
+group using Integ0
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+
+group insert \
+    [subst  {simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[0].integrator_inst.x[9:0]}]} ] \
+    [subst  {simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[0].integrator_inst.a[9:0]}]} ]
+group using {Debug vars}
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+
+group insert \
+    [subst  {simulator::[format {CIC_filter_tb.last_samples[0:3]}]} ] \
+    [subst  {simulator::[format {CIC_filter_tb.accum}]} ] \
+    [subst  {simulator::[format {CIC_filter_tb.last_sum}]} ] \
+    [subst  {simulator::[format {CIC_filter_tb.last_avg}]} ] \
+    [subst  {simulator::[format {CIC_filter_tb.out_cnt}]} ]
+
+#
+# Mnemonic Maps
+#
+mmap new  -reuse -name {Boolean as Logic} -radix %b -contents {{%c=FALSE -edgepriority 1 -shape low}
+{%c=TRUE -edgepriority 1 -shape high}}
+mmap new  -reuse -name {Example Map} -radix %x -contents {{%b=11???? -bgcolor orange -label REG:%x -linecolor yellow -shape bus}
+{%x=1F -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=2C -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=* -label %x -linecolor gray -shape bus}}
+
+#
+# Design Browser windows
+#
+if {[catch {window new WatchList -name "Design Browser 1" -geometry 730x500+261+33}] != ""} {
+    window geometry "Design Browser 1" 730x500+261+33
+}
+window target "Design Browser 1" on
+browser using {Design Browser 1}
+browser set -scope [subst  {simulator::[format {CIC_filter_tb.CIC_filter_inst}]} ]
+browser set \
+    -signalsort name
+browser yview see [subst  {simulator::[format {CIC_filter_tb.CIC_filter_inst}]} ]
+browser timecontrol set -lock 0
+
+#
+# Waveform windows
+#
+if {[catch {window new WaveWindow -name "Waveform 1" -geometry 1871x958+49+27}] != ""} {
+    window geometry "Waveform 1" 1871x958+49+27
+}
+window target "Waveform 1" on
+waveform using {Waveform 1}
+waveform sidebar visibility partial
+waveform set \
+    -primarycursor TimeA \
+    -signalnames name \
+    -signalwidth 175 \
+    -units ns \
+    -valuewidth 75
+waveform baseline set -time 0
+
+
+set groupId0 [waveform add -groups {{TB clks}}]
+
+
+set groupId0 [waveform add -groups {{DUT clks}}]
+
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.in[7:0]}]}
+	} ]]
+waveform format $id -radix %d
+
+set groupId0 [waveform add -groups Comb0]
+set gpGlist0 [waveform hierarchy contents $groupId0]
+set gpID0 [lindex $gpGlist0 0]
+foreach {name attrs} [subst  {
+    {simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[0].comb_inst.a[9:0]}]} {-radix %d}
+    {simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[0].comb_inst.y[9:0]}]} {-radix %d}
+}] childcmds {
+    {}
+    {}
+} {
+    set expected [ join [waveform signals -format fullpath $gpID0] ]
+    if {[string equal $name $expected] || $name == "cdivider"} {
+        if {$attrs != ""} {
+            eval waveform format $gpID0 $attrs
+        }
+        if { $childcmds != ""} {
+            eval $childcmds
+        }
+    }
+    set gpGlist0 [lrange $gpGlist0 1 end]
+    set gpID0 [lindex $gpGlist0 0]
+}
+
+
+set groupId0 [waveform add -groups Decim/Interp]
+set gpGlist0 [waveform hierarchy contents $groupId0]
+set gpID0 [lindex $gpGlist0 0]
+foreach {name attrs} [subst  {
+    {simulator::[format {CIC_filter_tb.CIC_filter_inst.decim_or_interp_inst.in[9:0]}]} {-radix %d}
+    {simulator::[format {CIC_filter_tb.CIC_filter_inst.decim_or_interp_inst.out[9:0]}]} {-radix %d}
+}] childcmds {
+    {}
+    {}
+} {
+    set expected [ join [waveform signals -format fullpath $gpID0] ]
+    if {[string equal $name $expected] || $name == "cdivider"} {
+        if {$attrs != ""} {
+            eval waveform format $gpID0 $attrs
+        }
+        if { $childcmds != ""} {
+            eval $childcmds
+        }
+    }
+    set gpGlist0 [lrange $gpGlist0 1 end]
+    set gpID0 [lindex $gpGlist0 0]
+}
+
+
+set groupId0 [waveform add -groups Integ0]
+set gpGlist0 [waveform hierarchy contents $groupId0]
+set gpID0 [lindex $gpGlist0 0]
+foreach {name attrs} [subst  {
+    {simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[0].integrator_inst.x[9:0]}]} {-radix %d}
+    {simulator::[format {CIC_filter_tb.CIC_filter_inst.genblk1[0].integrator_inst.a[9:0]}]} {-radix %d}
+}] childcmds {
+    {}
+    {}
+} {
+    set expected [ join [waveform signals -format fullpath $gpID0] ]
+    if {[string equal $name $expected] || $name == "cdivider"} {
+        if {$attrs != ""} {
+            eval waveform format $gpID0 $attrs
+        }
+        if { $childcmds != ""} {
+            eval $childcmds
+        }
+    }
+    set gpGlist0 [lrange $gpGlist0 1 end]
+    set gpID0 [lindex $gpGlist0 0]
+}
+
+set id [waveform add -signals [subst  {
+	{simulator::[format {CIC_filter_tb.out[7:0]}]}
+	} ]]
+waveform format $id -radix %d
+
+set groupId0 [waveform add -groups {{Debug vars}}]
+waveform hierarchy collapse $groupId0
+
+
+waveform xview limits 0 78ns
+
+#
+# Waveform Window Links
+#
+
+#
+# Console windows
+#
+console set -windowname Console
+window geometry Console 730x391+261+564
+
+#
+# Layout selection
+#
+

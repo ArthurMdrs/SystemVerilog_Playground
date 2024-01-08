@@ -56,9 +56,9 @@ AST_OVERFLOW_RESETS: assert property (SIGNAL_RESETS(overflow, 0));
 COV_OUTPUT_CAN_BE_3: cover property (
     (y != 3)[*(N_DELAYS+5)] ##1 (y == 3)
 );
-COV_OVERFLOW_THEN_NOT_OVERFLOW: cover property (
-    (!overflow)[*(N_DELAYS+5)] ##[+] (y == 2**WIDTH-1) ##[+] (overflow) ##[+] (!overflow)
-);
+// COV_OVERFLOW_THEN_NOT_OVERFLOW: cover property (
+//     (!overflow)[*(N_DELAYS+5)] ##[+] (y == 2**WIDTH-1) ##[+] (overflow) ##[+] (!overflow)
+// );
 COV_NORMAL_RESET_BEHAVIOUR: cover property (
     disable iff (1'b0)
     (rstn)[*5] ##1 (y != 0) ##1 (!rstn) ##[*] (y != 0)

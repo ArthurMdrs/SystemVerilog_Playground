@@ -1,11 +1,12 @@
 /*
-    This is a verification component with SVA code for the decimator module.
-    decimator.sv is in ../rtl/
+    This is a verification component with SVA code for the decim_or_interp module.
+    decim_or_interp.sv is in ../rtl/
 */
 
-module decimator_vc #(
+module decim_or_interp_vc #(
     int WIDTH = 1,
-    int DEC_RATE = 4
+    int RATE = 4, // must be power of 2
+    bit DnI = 1 // decimator = 1, interpolator = 0
 ) (
     input logic [WIDTH-1:0] out,
     input logic [WIDTH-1:0] in,
@@ -32,12 +33,16 @@ always_ff @(posedge clk_fast or negedge rstn) begin
 end
 
 // Properties
-property VALID_OUTPUT (clk_slow, out, in, dec_rate);
-    ($rose(clk_slow)) |=> ($stable(out))[*dec_rate-1];
+property VALID_DECIMATOR (clk_slow, dni, out, rate);
+    ($rose(clk_slow) && dni) |=> ($stable(out))[*rate-1];
 endproperty
 
-property RECOVER_AFTER_RESET (out, in, dec_rate);
-    $rose(rstn) |-> ##[1:dec_rate] ($stable(out))[*dec_rate-1];
+property VALID_INTERPOLATOR (dni, out, rate);
+    ((!dni) && (out != 0)) |=> (out == 0)[*rate-1];
+endproperty
+
+property RECOVER_AFTER_RESET (out, in, rate);
+    $rose(rstn) |-> ##[1:rate] ($stable(out))[*rate-1];
 endproperty
 
 property SIGNAL_RESETS (signal, rst_val);
@@ -45,10 +50,21 @@ property SIGNAL_RESETS (signal, rst_val);
     (!rstn) |-> (signal == rst_val);
 endproperty
 
+property SIGNAL_IS_POWER_OF_2 (signal);
+    ($onehot(signal));
+endproperty
+
+property SIGNAL_IS_AT_LEAST_2 (signal);
+    (signal >= 2);
+endproperty
+
 // Assertions
-AST_VALID_OUTPUT: assert property (VALID_OUTPUT(clk_slow, out, in, DEC_RATE));
-AST_RECOVER_AFTER_RESET: assert property (RECOVER_AFTER_RESET(out, in, DEC_RATE));
+AST_VALID_DECIMATOR: assert property (VALID_DECIMATOR(clk_slow, DnI, out, RATE));
+AST_VALID_INTERPOLATOR: assert property (VALID_INTERPOLATOR(DnI, out, RATE));
+AST_RECOVER_AFTER_RESET: assert property (RECOVER_AFTER_RESET(out, in, RATE));
 AST_OUT_RESETS: assert property (SIGNAL_RESETS(out, 0));
+AST_RATE_IS_POWER_OF_2: assert property (SIGNAL_IS_POWER_OF_2(RATE));
+AST_RATE_IS_AT_LEAST_2: assert property (SIGNAL_IS_AT_LEAST_2(RATE));
 
 // Covers
 property SIGNAL_CAN_BE_VALUE (signal, value);

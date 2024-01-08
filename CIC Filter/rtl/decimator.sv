@@ -10,7 +10,8 @@ module decimator #(
 ) (
     output logic [WIDTH-1:0] out,
     input  logic [WIDTH-1:0] in,
-    input  logic             clk,
+    input  logic             clk_slow,
+    input  logic             clk_fast,
     input  logic             rstn
 );
 
@@ -32,20 +33,20 @@ module decimator #(
 //     end
 // end
 
-logic [$clog2(DEC_RATE/2):0] cnt;
-logic clk_slow;
+// logic [$clog2(DEC_RATE/2):0] cnt;
+// logic clk_slow;
 
-always_ff @(posedge clk or negedge rstn) begin
-    if (!rstn) begin
-        cnt <= 0;
-        clk_slow <= 0;
-    end else if (cnt < DEC_RATE/2 - 1) begin
-        cnt <= cnt + 1;
-    end else begin
-        cnt <= 0;
-        clk_slow <= !clk_slow;
-    end
-end
+// always_ff @(posedge clk or negedge rstn) begin
+//     if (!rstn) begin
+//         cnt <= 0;
+//         clk_slow <= 0;
+//     end else if (cnt < DEC_RATE/2 - 1) begin
+//         cnt <= cnt + 1;
+//     end else begin
+//         cnt <= 0;
+//         clk_slow <= !clk_slow;
+//     end
+// end
 
 // Drive output
 always_ff @(posedge clk_slow or negedge rstn) begin
@@ -65,9 +66,9 @@ bind decimator decimator_vc #(
 ) decimator_vc_inst (
     .out,
     .in,
-    .clk,
-    .rstn,
-    .clk_slow
+    .clk_slow,
+    .clk_fast,
+    .rstn
 );
 
 `endif

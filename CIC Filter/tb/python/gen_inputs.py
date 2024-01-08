@@ -21,13 +21,6 @@ random.seed()
 wave_out = np.zeros(len(t))
 wave_out = generate_wave(wave_type, t)
 
-# A_max = 20
-# for i in range(1, max_harmonic+1):
-#     A = random.randint(1, A_max) / i
-#     # theta = random.random() * 2*np.pi
-#     theta = 0
-#     wave_out += A * np.sin(i*w0*t + theta)
-
 # Shift the wave up so we don't get negative values
 wave_out -= min(wave_out)
 

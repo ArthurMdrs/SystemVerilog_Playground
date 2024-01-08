@@ -14,27 +14,6 @@ module integrator #(
     input  logic             rstn
 );
 
-// // Declaration of delaye stage
-// logic [WIDTH-1:0] delayed;
-
-// // Drive delayed stage
-// always_ff @(posedge clk or negedge rstn) begin
-//     if (!rstn)
-//         delayed <= 0;
-//     else
-//         delayed <= a;
-// end
-
-// // Drive outputs
-// always_ff @(posedge clk or negedge rstn) begin
-//     if (!rstn) begin
-//         a <= 0;
-//         overflow <= 0;
-//     end else begin
-//         {overflow, a} <= x + delayed;
-//     end
-// end
-
 // Drive outputs
 always_ff @(posedge clk or negedge rstn) begin
     if (!rstn) begin
@@ -57,7 +36,6 @@ bind integrator integrator_vc #(
     .x,
     .clk,
     .rstn
-    // .delayed
 );
 
 `endif

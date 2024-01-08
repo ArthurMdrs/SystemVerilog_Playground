@@ -1,7 +1,7 @@
 /*
     This is a comb module intended to be used in a CIC filter.
     The output follows the equation:
-        y(n) = a(n) - a(n-4)
+        y(n) = a(n) - a(n-N_DELAYS)
 */
 
 module comb #(

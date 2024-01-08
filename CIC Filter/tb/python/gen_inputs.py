@@ -7,9 +7,6 @@ from definitions import *
 # Change to 1 if you want to plot the wave
 plot = 0
 
-# Fundamental frequency in radians/s
-# w0 = 2*np.pi*f0
-
 # Define time vector
 t = np.arange(t_start, t_end, Ts)
 
@@ -32,7 +29,6 @@ for i in range(len(wave_out)):
 wave_out_int = []
 input_file = open("input.txt", "w")
 for i in wave_out:
-    # print(i)
     wave_out_int.append(int(i))
     input_file.write(str(int(i)) + "\n")
 input_file = open("input.txt", "rb+")

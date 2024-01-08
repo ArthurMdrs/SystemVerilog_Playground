@@ -47,7 +47,6 @@ property SIGNAL_IS_AT_LEAST_2 (signal);
 endproperty
 
 property CLK_RELATION (clk_fast, clk_slow, rate);
-    // @(posedge clk_fast)
     ($rose(clk_slow)) |=>  $stable(clk_slow)[*(rate/2-1)];
 endproperty
 

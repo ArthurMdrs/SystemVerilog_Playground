@@ -5,7 +5,7 @@
     calculate the average.
 
     As you can cascade many CIC filters in series, the STAGES parameter defines
-    how many filter stages there are.
+    how many filter stages there are. This is the filter order.
 
     The decimation/interpolation rate is equal to the filter's length.
     I.e. averaging the last 8 samples means the rate is 8. 
@@ -92,24 +92,14 @@ generate
     end    
 endgenerate
 
-// decimator #(
-//     .WIDTH(REGS_WIDTH),
-//     .DEC_RATE(RATE)
-// ) decimator_inst (
-//     .out(comb_in[0]),
-//     .in(integ_out[STAGES-1]),
-//     .clk_slow(clk_slow),
-//     .clk_fast(clk_fast),
-//     .rstn(rstn)
-// );
-
 // Create input and output for decimator/interpolator block
 logic [REGS_WIDTH-1:0] doi_in;
 logic [REGS_WIDTH-1:0] doi_out;
 
-// assign doi_out = (DnI) ? comb_in[0] : integ_in[0];
+// Assign decimator/interpolator input
 assign doi_in  = (DnI) ? integ_out[STAGES-1] : comb_out[STAGES-1];
 
+// Decimator/interpolator instance
 decim_or_interp #(
     .WIDTH(REGS_WIDTH),
     .RATE(RATE),
@@ -137,9 +127,6 @@ always_comb begin
     else     // interpolator
         out = integ_out[STAGES-1] >> ((STAGES-1) * $clog2(RATE));
 end
-
-// assign out = comb_out[STAGES-1] >> (STAGES * $clog2(RATE));
-// assign out = comb_out[STAGES-1] >> ($clog2(RATE**STAGES));
 
 
 

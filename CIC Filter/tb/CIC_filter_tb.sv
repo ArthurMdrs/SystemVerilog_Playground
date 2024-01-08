@@ -1,11 +1,10 @@
 typedef enum bit {FROM_TXT_FILE, FROM_RNG} input_mode_t;
+// FROM_RNG input mode need to be perfected!
+// For now just use the text file generated with python code
 
 module CIC_filter_tb;
 
-    // DUT parameters
-    // localparam int WIDTH = 8;
-    // localparam int STAGES = 1;
-    // localparam int RATE = 4;
+    // DUT parameters included from external file
     `include "params.sv"
 
     // DUT ports
@@ -42,33 +41,12 @@ module CIC_filter_tb;
     logic [$clog2(RATE)-1:0] cnt_to_size = 0;
 
     // Clock generation
-    localparam int PERIOD = 2, MAX_CYCLES = 10000;
-    // bit fast_clk;
+    localparam int PERIOD = 2, MAX_CYCLES = 50000;
     initial begin
         fast_clk = 0; 
         repeat(MAX_CYCLES) #(PERIOD/2) fast_clk = ~fast_clk;
         $display ("\nSimulation reached the time limit. Terminating simulation.\n");
         $finish;
-    end
-
-    bit slow_clk; // Used to drive input for interpolator
-    // initial begin
-    //     slow_clk = 0;
-    //     forever
-    //         #(RATE*PERIOD/2) slow_clk = ~slow_clk;
-    // end
-
-    logic [$clog2(RATE/2):0] cnt;
-    always_ff @(posedge fast_clk or negedge rstn) begin
-        if (!rstn) begin
-            cnt <= 0;
-            slow_clk <= 0;
-        end else if (cnt < RATE/2 - 1) begin
-            cnt <= cnt + 1;
-        end else begin
-            cnt <= 0;
-            slow_clk <= !slow_clk;
-        end
     end
 
     // ===================== TASKS AND FUNCTIONS BEGIN ===================== //
@@ -79,7 +57,7 @@ module CIC_filter_tb;
         $display("%t: Reset done.", $realtime);
     endtask : reset
 
-    function int compute_expected_latency (int stages); // Ignore this
+    function int compute_expected_latency (int stages); // IGNORE THIS
         int cnt_down;
         int expected_latency;
 
@@ -138,7 +116,7 @@ module CIC_filter_tb;
         end
 
         // Compute expected latency between full set of inputs and corresponding output
-        expected_latency = compute_expected_latency(STAGES);
+        expected_latency = compute_expected_latency(STAGES); // IGNORE THIS
 
         // Driving stimulus
         reset();
@@ -151,12 +129,6 @@ module CIC_filter_tb;
             // Read and drive input data stream
             while (my_char !== 255) begin
                 // Read next data input
-                // if (DnI) begin
-                //     errcode = $fscanf(input_file, "%d", in);
-                // end else if (cnt_to_size == 0) begin
-                //     errcode = $fscanf(input_file, "%d", in);
-                //     $display("%t: in is %0d", $time, in);
-                // end
                 if (DnI || cnt_to_size == 0) begin
                     errcode = $fscanf(input_file, "%d", in);
                     // $display("%t: in is %0d", $time, in);
@@ -176,7 +148,7 @@ module CIC_filter_tb;
                 else
                     out_cnt_flag = 1;
 
-                // Perform checking
+                // Perform checking (DOES NOT WORK!!)
                 // if (cnt_to_size == 0)
                 //     fork
                 //         checkit (last_avg, verbose);
@@ -186,8 +158,8 @@ module CIC_filter_tb;
 
                 // Write output to file
                 $fdisplay(output_file, "%d", out);
-                // $display("Output is %d", out);
             end
+
             // $display("%t: Output starts updating after %0d clks.", $realtime, out_cnt);
 
             // Keep observing outputs
@@ -204,7 +176,7 @@ module CIC_filter_tb;
 
 
 
-        else if (input_mode == FROM_RNG) begin
+        else if (input_mode == FROM_RNG) begin // USE THE OTHER TEST
             // Open files
             input_file = $fopen("input.txt", "w");
             output_file = $fopen("output.txt", "w");
@@ -245,33 +217,20 @@ module CIC_filter_tb;
         $finish;
     end
 
-    // int cnt1, cnt2;
-    // always @(posedge fast_clk) $display("%t: f %0d", $time, cnt1++);
-    // always @(posedge slow_clk) $display("%t: s %0d", $time, cnt2++);
-    // final $display("f %0d s %0d", cnt1, cnt2);
-    // final $display("fp %0d", PERIOD/2);
-    // final $display("sp %0d", RATE*PERIOD/2);
 
-    // Write output file
+// INITIAL BLOCK BELOW HAS NOT BEEN TESTED!!
+    // Write output file 
     // initial begin
     //     output_file = $fopen("output.txt", "w");
 
     //     repeat (2) // wait reset
-    //         @(negedge input_clk);
+    //         @(negedge fast_clk);
         
     //     // Wait for inactive clock edge so we know output was driven
-    //     @(negedge output_clk);
+    //     @(negedge fast_clk);
         
+    //     // Write output to file
+    //     $fdisplay(output_file, "%d", out);
     // end
 
 endmodule
-
-
-
-
-                // foreach (CIC_filter_inst.integ_of_vec[i]) begin
-                //     if (CIC_filter_inst.integ_of_vec[i])
-                //         $display("%t OVERFLOW integ elem %d", $realtime, i);
-                //     if (CIC_filter_inst.comb_of_vec[i])
-                //         $display("%t OVERFLOW comb elem %d", $realtime, i);
-                // end

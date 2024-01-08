@@ -23,13 +23,13 @@ SEED = 1
 WIDTH = 8
 STAGES = 3
 RATE = 8
-DnI = 0
+DnI = 1
 # DnI: decimator = 1, interpolator = 0
 
 run: genwave sim plot
 
 genwave:
-	python3 python/gen_inputs.py $(DnI) $(STAGES) $(RATE)
+	@python3 python/gen_inputs.py $(DnI) $(STAGES) $(RATE)
 
 plot:
 	@python3 python/plot.py $(DnI) $(STAGES) $(RATE)

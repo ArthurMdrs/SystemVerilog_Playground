@@ -8,7 +8,7 @@ print("This file is "+sys.argv[0])
 DnI = int(sys.argv[1])
 stages = int(sys.argv[2])
 rate = int(sys.argv[3])
-print(stages, " stages, ", "rate = ", rate)
+print("stages = ", stages, ", ", "rate = ", rate)
 
 # Fundamental frequency
 f0 = 100 # Hz
@@ -34,6 +34,7 @@ wave_type = options[0]
 def generate_wave(wave_type="sum_of_harmonics", t=0):
     wave_out = np.zeros(len(t))
     A_max = 260/2
+    print("Generating base waveform...")
 
     if (wave_type == options[0]): # Sum of harmonics
         for i in range(1, max_harmonic+1):
@@ -50,4 +51,5 @@ def generate_wave(wave_type="sum_of_harmonics", t=0):
     if (wave_type == options[2]): # Impulse
         wave_out[0] = A_max
 
+    print("Done.")
     return wave_out

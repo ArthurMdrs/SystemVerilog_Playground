@@ -1,0 +1,15 @@
+A CIC (Cascaded Integrator-Comb) filter is a moving average filter, commonly used in association with FIR (Finite Impulse Response) filters for decimation and interpolation applications.
+
+Directory structure:
+CIC Filter
+|-- results
+|   |-- decimation
+|   |-- interpolation
+|-- rtl
+|-- tb
+|   |-- log
+|   |-- png
+|   |-- python
+|   |-- tcl
+
+Open the terminal in the tb directory and run make.

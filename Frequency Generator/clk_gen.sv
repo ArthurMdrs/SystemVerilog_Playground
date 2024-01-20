@@ -38,7 +38,13 @@ assign clk_o = accum[SEL_WIDTH];
 
 `ifdef SVA_ON
 
+default clocking def_clk @(posedge clk_i); endclocking
 
+property STABLE_ON_HALT;
+    (halt) |=> ($stable(clk_o));
+endproperty
+
+AST_STABLE_ON_HALT: assert property (STABLE_ON_HALT);
 
 `endif
     

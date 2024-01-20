@@ -1,0 +1,8 @@
+This module is a frequency generator. A selector input will select the output frequency. The output is a digital clock with that frequency. The frequency depends on the input clock frequency, following the equation:
+    freq_o = freq_i * ((freq_sel + 1) / (2^(SEL_WIDTH+1)))
+    -freq_o: output frequency;
+    -freq_i: input frequency;
+    -freq_sel: input frequency selector;
+    -SEL_WIDTH: number of bits in freq_sel.
+
+The minimum value of the output frequency occurs when freq_sel = 0, and the maximum frequency occurs for the maximum value of freq_sel. The maximum output frequency is half the input frequency.

@@ -5,7 +5,7 @@ module clk_gen_tb;
     timeprecision 1ps;
 
     // DUT parameters
-    localparam int SEL_WIDTH = 5;
+    localparam int SEL_WIDTH = 8;
 
     // DUT signals
     logic                 clk_o;
@@ -26,10 +26,13 @@ module clk_gen_tb;
     );
 
     // Simulation variables
+    int wdw_n_periods = 3; // Size of time window for each input value
     real t_wdw_start, t_wdw_end;
-    int wdw_n_periods = 3;
-    real freq_o;
-    real freq_xpct;
+    real freq_o; // Actual output frequency
+    real freq_xpct; // Expected output frequency
+    real margin = 5; // Percentage margin of error allowed
+    bit verbose = 0;
+    int n_mismatches;
 
     // Input clock 
     localparam real FREQ_I = 600e6; // Hz
@@ -37,7 +40,8 @@ module clk_gen_tb;
     localparam int MAX_CYCLES = 10000;
     initial begin
         clk_i = 0; 
-        repeat(MAX_CYCLES) #(PERIOD/2) clk_i = ~clk_i;
+        // repeat(MAX_CYCLES) #(PERIOD/2) clk_i = ~clk_i;
+        forever #(PERIOD/2) clk_i = ~clk_i;
         $display ("\nSimulation reached the time limit. Terminating simulation.\n");
         $finish;
     end
@@ -68,10 +72,14 @@ module clk_gen_tb;
             freq_o = 1s / ((t_wdw_end - t_wdw_start) / wdw_n_periods);
 
             freq_xpct = FREQ_I * (freq_sel + 1) / 2.0**(SEL_WIDTH+1);
-            print_vals ();
+            checkit (freq_xpct, freq_o, margin);
+            if (verbose)
+                print_vals ();
 
             freq_sel += 1;
         end while (freq_sel != '0);
+
+        $display("%t: Simulation end. Number of mismatches: %0d.", $realtime, n_mismatches);
 
         $display("#==========================================================#");
         $finish;
@@ -79,7 +87,6 @@ module clk_gen_tb;
 
     //=============== Tasks and Functions - Begin ===============//
 
-    // Reset task
     task reset ();
         rst_n = 0;
         #3 rst_n = 1;
@@ -88,6 +95,23 @@ module clk_gen_tb;
 
     task print_vals ();
         $display("%t: Freq sel = 0x%h. Output freq = %.2e. Expected freq = %.2e.", $realtime, freq_sel, freq_o, freq_xpct);
+    endtask
+
+    task checkit (real expected, real actual, real margin);
+        real abs_margin;
+
+        assert (margin >= 0 && margin <= 100)
+        else $display("Margin should be a valid percentage value!");
+
+        abs_margin = expected * margin / 100;
+        // $display("Expected = %.2e. Margin is %.2e", expected, abs_margin);
+        // $display("expected - actual = %.2e.", expected - actual);
+        // $display("actual - expected = %.2e.", actual - expected);
+
+        if (expected - actual > abs_margin || actual - expected > abs_margin) begin
+            $display("%t: ERROR! Expected = %.2e. Actual = %.2e.", $realtime, expected, actual);
+            n_mismatches++;
+        end
     endtask
 
 endmodule

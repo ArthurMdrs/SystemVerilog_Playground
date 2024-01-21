@@ -8,7 +8,7 @@ except:
     print(f"ERROR! Too few or too many arguments. Use:\n    python3", sys.argv[0], "wave_type")
     sys.exit(1)
 
-valid_args = ["sine", "sawtooth", "triangular"]
+valid_args = ["sine", "sawtooth", "triangular", "rectangular"]
 try:
     assert (sys.argv[1] in valid_args)
 except:
@@ -38,25 +38,33 @@ my_str += ") (\n"
 my_str += f"    output logic signed [OUT_WIDTH-1:0] {wave_type}_o,\n"
 my_str += "    input  logic                        clk,\n"
 my_str += "    input  logic                        rst_n,\n"
-my_str += "    input  logic        [SEL_WIDTH-1:0] lut_sel\n);\n\n"
+my_str += "    input  logic        [SEL_WIDTH-1:0] lut_sel"
+my_str += ",\n    input  logic                        reverse" if (wave_type == "sawtooth") else ""
+my_str += ",\n    input  logic        [SEL_WIDTH-1:0] duty_cycle" if (wave_type == "rectangular") else ""
+my_str += "\n);\n\n"
+my_str += "logic [SEL_WIDTH-1:0] sawtooth_sel;\n" if (wave_type == "sawtooth") else ""
+my_str += "assign sawtooth_sel = (reverse) ? ~lut_sel : lut_sel;\n\n" if (wave_type == "sawtooth") else ""
 my_str += "always_ff @(posedge clk or negedge rst_n) begin\n"
 my_str += "    if (!rst_n) begin\n"
 my_str += f"        {wave_type}_o <= 0;\n"
 my_str += "    end else begin\n"
-my_str += "        case(lut_sel)\n"
-for i in range(0, n_points):
-    val = 0
-    if wave_type == valid_args[0]:
-        val = int(round((2**(n_bits-1) - 1) * np.sin(2*np.pi * i/n_points)))
-    if wave_type == valid_args[1]:
-        val = int(round((2**(n_bits-1) - 1) * (2/np.pi) * np.arctan(np.tan(np.pi*i/n_points))))
-    if wave_type == valid_args[2]:
-        val = int(round((2**(n_bits-1) - 1) * (4/n_points * np.abs(i - n_points * np.floor(i/n_points + 0.5)) - 1)))
-    number_str = "" if (val >= 0) else "-"
-    number_str += f"{n_bits}'sd{abs(val)}"
-    my_str += f"            {i}: {wave_type}_o <= {number_str};\n"
-    vec.append(val)
-my_str += "        endcase\n"
+if wave_type == "rectangular":
+    my_str += f"        {wave_type}_o <= (lut_sel < duty_cycle) ? {n_bits}'sd{(2**(n_bits-1) - 1)} : -{n_bits}'sd{(2**(n_bits-1) - 1)};\n"
+else:
+    my_str +=  "        case(sawtooth_sel)\n" if (wave_type == "sawtooth") else "        case(lut_sel)\n"
+    for i in range(0, n_points):
+        val = 0
+        if wave_type == valid_args[0]:
+            val = int(round((2**(n_bits-1) - 1) * np.sin(2*np.pi * i/n_points)))
+        if wave_type == valid_args[1]:
+            val = int(round((2**(n_bits-1) - 1) * (2/np.pi) * np.arctan(np.tan(np.pi*i/n_points))))
+        if wave_type == valid_args[2]:
+            val = int(round((2**(n_bits-1) - 1) * (4/n_points * np.abs(i - n_points * np.floor(i/n_points + 0.5)) - 1)))
+        number_str = "" if (val >= 0) else "-"
+        number_str += f"{n_bits}'sd{abs(val)}"
+        my_str += f"            {i}: {wave_type}_o <= {number_str};\n"
+        vec.append(val)
+    my_str += "        endcase\n"
 my_str += "    end\n"
 my_str += "end\n\n"
 my_str += "endmodule\n"

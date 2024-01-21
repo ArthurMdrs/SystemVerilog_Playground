@@ -10,14 +10,18 @@ module sawtooth_lut #(
     output logic signed [OUT_WIDTH-1:0] sawtooth_o,
     input  logic                        clk,
     input  logic                        rst_n,
-    input  logic        [SEL_WIDTH-1:0] lut_sel
+    input  logic        [SEL_WIDTH-1:0] lut_sel,
+    input  logic                        reverse
 );
+
+logic [SEL_WIDTH-1:0] sawtooth_sel;
+assign sawtooth_sel = (reverse) ? ~lut_sel : lut_sel;
 
 always_ff @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
         sawtooth_o <= 0;
     end else begin
-        case(lut_sel)
+        case(sawtooth_sel)
             0: sawtooth_o <= 16'sd0;
             1: sawtooth_o <= 16'sd4096;
             2: sawtooth_o <= 16'sd8192;

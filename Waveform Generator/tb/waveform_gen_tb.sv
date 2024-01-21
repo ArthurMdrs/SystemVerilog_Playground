@@ -18,6 +18,8 @@ module waveform_gen_tb;
     logic        [SEL_WIDTH-1:0] freq_sel;
     wave_sel_t                   wave_sel; 
     logic                        halt;
+    logic                        saw_reverse;
+    logic        [CNT_WIDTH-1:0] rec_duty_cyc;
 
     // The DUT
     waveform_gen #(
@@ -28,7 +30,9 @@ module waveform_gen_tb;
         .rst_n,
         .freq_sel,
         .wave_sel, 
-        .halt
+        .halt,
+        .saw_reverse,
+        .rec_duty_cyc
     );
 
 
@@ -72,7 +76,8 @@ module waveform_gen_tb;
         reset ();
 
         halt = 0;
-        // freq_sel = '1;
+        saw_reverse = 1;
+        rec_duty_cyc = 0.7*15;
         freq_sel = 200;
         wave_sel = SINE_WAVE;
         prev_wave_type = wave_sel.next();
@@ -89,7 +94,8 @@ module waveform_gen_tb;
         wave_sel = TRIANGULAR_WAVE;
         repeat (100) @(negedge clk);
 
-        // TO DO: use the checkit task!!
+        wave_sel = RECTANGULAR_WAVE;
+        repeat (100) @(negedge clk);
 
         $display("%t: Simulation end. Number of mismatches: %0d.", $realtime, n_mismatches);
 
@@ -120,16 +126,16 @@ module waveform_gen_tb;
             end
 
             if (!wave_type_changed) begin
-                freq_xpct = (FREQ_I * (freq_sel + 1) / 2.0**(SEL_WIDTH+1)) / (LUT_WIDTH/2);
+                freq_xpct = get_expected_freq();
                 if (verbose) begin
                     $display("#==========================================================#");
                     $display("%t: Waveform type is %s.", $realtime, wave_sel.name());
                     $display("Measured frequency = %.2e. Expected frequency = %.2e.", freq_o, freq_xpct);
                     $display("#==========================================================#");
                 end
+                checkit (freq_xpct, freq_o, margin);
             end
 
-            // TO DO: use the checkit task!!
         end
     end
 
@@ -150,50 +156,62 @@ module waveform_gen_tb;
         abs_margin = expected * margin / 100;
 
         if (expected - actual > abs_margin || actual - expected > abs_margin) begin
-            $display("%t: ERROR! Expected = %.2e. Actual = %.2e.", $realtime, expected, actual);
+            $display("%t: ERROR! Expected = %.2e. Actual = %.2e. Wave type = %s.", $realtime, expected, actual, wave_sel.name());
             n_mismatches++;
         end
     endtask
 
     task measure_freq ();
-        if (wave_o > prev_sample) begin
-            if (!up_n_down) begin
-                got_valley = 1;
-                valley_t = $realtime;
-                got_peak = 0;
-            end
-            else begin
-                got_valley = 0;
-            end
-            up_n_down = 1;
-        end
-
-        else if (wave_o < prev_sample) begin
-            if (up_n_down) begin
+        if (wave_sel == RECTANGULAR_WAVE) begin
+            if (!got_peak && wave_o > 0) begin
                 got_peak = 1;
-                prev_peak_t = peak_t;
+                freq_o = 1s / ($realtime - peak_t);
                 peak_t = $realtime;
-                got_valley = 0;
             end
-            else begin
+            else if (wave_o < 0) begin
                 got_peak = 0;
             end
-            up_n_down = 0;
         end
+        else begin
+            if (wave_o > prev_sample) begin
+                if (!up_n_down) begin
+                    got_valley = 1;
+                    valley_t = $realtime;
+                    got_peak = 0;
+                end
+                else begin
+                    got_valley = 0;
+                end
+                up_n_down = 1;
+            end
 
-        if (valley_t > 0 && peak_t > 0) begin
-            if (wave_sel == SAWTOOTH_WAVE && got_peak) begin
-                freq_o = 1s / (peak_t - prev_peak_t);
+            else if (wave_o < prev_sample) begin
+                if (up_n_down) begin
+                    got_peak = 1;
+                    prev_peak_t = peak_t;
+                    peak_t = $realtime;
+                    got_valley = 0;
+                end
+                else begin
+                    got_peak = 0;
+                end
+                up_n_down = 0;
             end
-            else begin
-                if (got_peak)
-                    freq_o = 1s / ((peak_t - valley_t) * 2);
-                if (got_valley)
-                    freq_o = 1s / ((valley_t - peak_t) * 2);
+
+            if (valley_t > 0 && peak_t > 0) begin
+                if (wave_sel == SAWTOOTH_WAVE && got_peak) begin
+                    freq_o = 1s / (peak_t - prev_peak_t);
+                end
+                else begin
+                    if (got_peak)
+                        freq_o = 1s / ((peak_t - valley_t) * 2);
+                    if (got_valley)
+                        freq_o = 1s / ((valley_t - peak_t) * 2);
+                end
             end
+
+            prev_sample = wave_o;
         end
-
-        prev_sample = wave_o;
     endtask
 
     task test_all_wave_types ();
@@ -209,7 +227,8 @@ module waveform_gen_tb;
         // TO DO!!
     endtask
 
-
-    // TO DO!! Function to calculate expected frequency!!
+    function real get_expected_freq ();
+        return (FREQ_I * (freq_sel + 1) / 2.0**(SEL_WIDTH+1)) / (LUT_WIDTH/2);
+    endfunction
     
 endmodule

@@ -1,0 +1,99 @@
+# SimVision Command Script (Sat Jan 20 15:47:40 -03 2024)
+#
+# Version 23.09.s003
+#
+
+
+#
+# Preferences
+#
+preferences set plugin-enable-svdatabrowser-new 1
+preferences set plugin-enable-groupscope 0
+preferences set plugin-enable-interleaveandcompare 0
+preferences set plugin-enable-waveformfrequencyplot 0
+
+#
+# Simulator
+#
+database require simulator -hints {
+	simulator "xrun -timescale 1ns/1ps ../rtl/pkg/waveform_gen_pkg.sv ../rtl/clk_gen.sv ../rtl/sine_lut.sv ../rtl/waveform_gen.sv ./waveform_gen_tb.sv -gui -access +rwc -input simvision.tcl -input simvision.tcl"
+}
+
+#
+# Mnemonic Maps
+#
+mmap new  -reuse -name {Boolean as Logic} -radix %b -contents {{%c=FALSE -edgepriority 1 -shape low}
+{%c=TRUE -edgepriority 1 -shape high}}
+mmap new  -reuse -name {Example Map} -radix %x -contents {{%b=11???? -bgcolor orange -label REG:%x -linecolor yellow -shape bus}
+{%x=1F -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=2C -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=* -label %x -linecolor gray -shape bus}}
+
+#
+# Design Browser windows
+#
+if {[catch {window new WatchList -name "Design Browser 1" -geometry 730x500+261+33}] != ""} {
+    window geometry "Design Browser 1" 730x500+261+33
+}
+window target "Design Browser 1" on
+browser using {Design Browser 1}
+browser set -scope [subst  {simulator::[format {waveform_gen_tb}]} ]
+browser set \
+    -signalsort name
+browser yview see [subst  {simulator::[format {waveform_gen_tb}]} ]
+browser timecontrol set -lock 0
+
+#
+# Waveform windows
+#
+if {[catch {window new WaveWindow -name "Waveform 1" -geometry 1871x958+49+27}] != ""} {
+    window geometry "Waveform 1" 1871x958+49+27
+}
+window target "Waveform 1" on
+waveform using {Waveform 1}
+waveform sidebar visibility partial
+waveform set \
+    -primarycursor TimeA \
+    -signalnames name \
+    -signalwidth 175 \
+    -units ps \
+    -valuewidth 90
+waveform baseline set -time 0
+
+set id [waveform add -signals [subst  {
+	{simulator::[format {waveform_gen_tb.clk}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {waveform_gen_tb.rst_n}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {waveform_gen_tb.dut.my_cnt[3:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {waveform_gen_tb.dut.clk_gen_inst.clk_o}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {waveform_gen_tb.dut.clk_gen_inst.accum[8:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {waveform_gen_tb.wave_o[15:0]}]}
+	} ]]
+waveform format $id -radix %d -trace analogSampleAndHold
+waveform axis range $id -for default -min -32767 -max 32767 -scale linear
+
+waveform xview limits 0 102000ps
+
+#
+# Waveform Window Links
+#
+
+#
+# Console windows
+#
+console set -windowname Console
+window geometry Console 730x250+261+564
+
+#
+# Layout selection
+#
+

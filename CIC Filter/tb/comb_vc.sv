@@ -41,16 +41,9 @@ property VALID_OUTPUT (out, in, n_delays, overflow);
     (delays_waited  > n_delays) |-> (out == $past(in) - $past(in, n_delays+1)) || (overflow);
 endproperty
 
-property SIGNAL_RESETS (signal, rst_val);
-    disable iff (1'b0)
-    (!rstn) |-> (signal == rst_val);
-endproperty
-
 // Assertions
 AST_PROPER_DELAY: assert property (PROPER_DELAY(delayed [N_DELAYS-1], a, N_DELAYS));
 AST_VALID_OUTPUT: assert property (VALID_OUTPUT(y, a, N_DELAYS, overflow));
-AST_Y_RESETS: assert property (SIGNAL_RESETS(y, 0));
-AST_OVERFLOW_RESETS: assert property (SIGNAL_RESETS(overflow, 0));
 
 // Covers
 COV_OUTPUT_CAN_BE_3: cover property (
@@ -59,6 +52,17 @@ COV_OUTPUT_CAN_BE_3: cover property (
 // COV_OVERFLOW_THEN_NOT_OVERFLOW: cover property (
 //     (!overflow)[*(N_DELAYS+5)] ##[+] (y == 2**WIDTH-1) ##[+] (overflow) ##[+] (!overflow)
 // );
+
+// Reset checks below
+// There should be "reset -none" and "assume -reset !rstn" in the Jasper tcl file
+property SIGNAL_RESETS (signal, rst_val);
+    disable iff (1'b0)
+    (!rstn) |-> (signal == rst_val);
+endproperty
+
+AST_Y_RESETS: assert property (SIGNAL_RESETS(y, 0));
+AST_OVERFLOW_RESETS: assert property (SIGNAL_RESETS(overflow, 0));
+
 COV_NORMAL_RESET_BEHAVIOUR: cover property (
     disable iff (1'b0)
     (rstn)[*5] ##1 (y != 0) ##1 (!rstn) ##[*] (y != 0)

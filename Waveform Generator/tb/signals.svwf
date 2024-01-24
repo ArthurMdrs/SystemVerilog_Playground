@@ -1,0 +1,44 @@
+
+#
+# Mnemonic Maps
+#
+mmap new  -reuse -name {Boolean as Logic} -radix %b -contents {{%c=FALSE -edgepriority 1 -shape low}
+{%c=TRUE -edgepriority 1 -shape high}}
+mmap new  -reuse -name {Example Map} -radix %x -contents {{%b=11???? -bgcolor orange -label REG:%x -linecolor yellow -shape bus}
+{%x=1F -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=2C -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=* -label %x -linecolor gray -shape bus}}
+
+array unset createdGroup
+array set createdGroup {}
+set id [waveform add -signals [subst  {
+	{[format {waveform_gen_tb.clk}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {waveform_gen_tb.rst_n}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {waveform_gen_tb.dut.clk_gen_inst.accum[8:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {waveform_gen_tb.dut.clk_gen_inst.clk_o}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {waveform_gen_tb.dut.my_cnt[3:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {waveform_gen_tb.wave_o[15:0]}]}
+	} ]]
+waveform format $id -radix %d -trace analogSampleAndHold
+waveform axis range $id -for default -min -32767 -max 32767 -scale linear
+set id [waveform add -signals [subst  {
+	{[format {waveform_gen_tb.got_peak}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {waveform_gen_tb.freq_sel[7:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {waveform_gen_tb.rec_duty_cyc[3:0]}]}
+	} ]]
+
+waveform xview limits 0 770000ps

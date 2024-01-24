@@ -6,5 +6,5 @@ TB="./*.sv"
 
 xrun -timescale 1ns/1ps \
     $PKG $RTL $TB \
-    # -gui -access +rwc \
-    # -input simvision.tcl
+    -gui -access +rwc \
+    -input simvision.tcl

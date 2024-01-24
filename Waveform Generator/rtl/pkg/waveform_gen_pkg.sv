@@ -9,5 +9,6 @@ package waveform_gen_pkg;
 
     localparam int LUT_WIDTH = 16;
     localparam int CNT_WIDTH = $clog2(LUT_WIDTH);
+    localparam int LUT_SIZE  = 16;
 
 endpackage

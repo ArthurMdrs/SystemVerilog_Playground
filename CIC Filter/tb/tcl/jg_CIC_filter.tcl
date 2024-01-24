@@ -4,11 +4,11 @@ analyze -sv12 +define+SVA_BIGBLK=1 \
     ./CIC_filter_vc.sv \
     ../rtl/CIC_filter.sv \
     ../rtl/comb.sv \
-    ../rtl/decimator.sv \
+    ../rtl/decim_or_interp.sv \
     ../rtl/integrator.sv
 analyze -sv12 +define+SVA_SMLBLK=1 \
     ./comb_vc.sv \
-    ./decimator_vc.sv \
+    ./decim_or_interp_vc.sv \
     ./integrator_vc.sv
 #elaborate -top CIC_filter -create_related_covers witness
 elaborate -top CIC_filter -create_related_covers witness -parameter {WIDTH} {8} -parameter {STAGES} {3} -parameter {RATE} {4}

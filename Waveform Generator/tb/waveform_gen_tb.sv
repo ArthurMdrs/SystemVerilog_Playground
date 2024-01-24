@@ -40,8 +40,9 @@ module waveform_gen_tb;
     real freq_o; // Actual output frequency
     real freq_xpct; // Expected output frequency
     real margin = 10; // Percentage margin of error allowed
-    bit verbose = 1;
+    bit verbose = 0;
     int n_mismatches;
+    enum {ALL_WAVE_TYPES, DIFF_FREQS, RECT_DUTY_CYCLE, SAW_REVERSE, HALT} test_sel;
     
     // Frequency measurement variables
     bit got_peak, got_valley, up_n_down;
@@ -77,25 +78,21 @@ module waveform_gen_tb;
 
         halt = 0;
         saw_reverse = 1;
-        rec_duty_cyc = 0.7*15;
+        rec_duty_cyc = 0.7 * (2**CNT_WIDTH-1);
         freq_sel = 200;
         wave_sel = SINE_WAVE;
         prev_wave_type = wave_sel.next();
 
-        repeat (50) @(negedge clk);
+        test_sel = RECT_DUTY_CYCLE;
 
-        // reset ();
-
-        repeat (50) @(negedge clk);
-
-        wave_sel = SAWTOOTH_WAVE;
-        repeat (100) @(negedge clk);
-
-        wave_sel = TRIANGULAR_WAVE;
-        repeat (100) @(negedge clk);
-
-        wave_sel = RECTANGULAR_WAVE;
-        repeat (100) @(negedge clk);
+        case (test_sel)
+            ALL_WAVE_TYPES: 
+                test_all_wave_types (get_expected_freq ());
+            DIFF_FREQS: // We get frequency errors in this, but graphically seems fine
+                test_different_freqs (SINE_WAVE);
+            RECT_DUTY_CYCLE: 
+                test_different_duty_cycles ();
+        endcase
 
         $display("%t: Simulation end. Number of mismatches: %0d.", $realtime, n_mismatches);
 
@@ -214,21 +211,70 @@ module waveform_gen_tb;
         end
     endtask
 
-    task test_all_wave_types ();
-        // TO DO!!
-        // Should just be what's already being simulated
+    task test_all_wave_types (real freq);
+        real rpt_cycles;
+        wave_sel_t t;
+        rpt_cycles = 2s / freq; // This is 2x expected Period
+
+        halt = 0;
+        saw_reverse = 0;
+        rec_duty_cyc = 0.5* (2**CNT_WIDTH-1);
+        prev_wave_type = wave_sel.last();
+
+        t = t.first();
+        do begin
+            wave_sel = t;
+            repeat (rpt_cycles) @(negedge clk);
+            t = t.next();
+        end while (t != t.first());
+
     endtask
 
-    task test_different_freqs ();
-        // TO DO!!
+    task test_different_freqs (wave_sel_t wave_type);
+        real rpt_cycles;
+        wave_sel = wave_type;
+
+        halt = 0;
+        saw_reverse = 0;
+        rec_duty_cyc = 0.3 * (2**CNT_WIDTH-1);
+        prev_wave_type = wave_sel.next();
+
+        for (int i = 0; i < 2**SEL_WIDTH; i++) begin
+            freq_sel = i;
+            rpt_cycles = 2s / get_expected_freq (); // This is 2x expected Period
+            repeat (rpt_cycles) @(negedge clk);
+        end
     endtask
 
     task test_different_duty_cycles ();
+        real rpt_cycles;
+
+        halt = 0;
+        freq_sel = 255;
+        wave_sel = RECTANGULAR_WAVE;
+        prev_wave_type = wave_sel.next();
+
+        for (int i = 0; i < 2**CNT_WIDTH; i++) begin
+            rec_duty_cyc = i;
+            rpt_cycles = 3s / get_expected_freq (); // This is 3x expected Period
+            repeat (rpt_cycles) @(negedge clk);
+        end
+    endtask
+
+    task test_saw_reverse ();
+        real rpt_cycles;
+
+        // TO DO!!
+    endtask
+
+    task test_halt ();
+        real rpt_cycles;
+
         // TO DO!!
     endtask
 
     function real get_expected_freq ();
-        return (FREQ_I * (freq_sel + 1) / 2.0**(SEL_WIDTH+1)) / (LUT_WIDTH/2);
+        return (FREQ_I * (freq_sel + 1) / 2.0**(SEL_WIDTH+1)) / (LUT_SIZE/2);
     endfunction
     
 endmodule

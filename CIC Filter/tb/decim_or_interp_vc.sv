@@ -41,15 +41,6 @@ property VALID_INTERPOLATOR (dni, out, rate);
     ((!dni) && (out != 0)) |=> (out == 0)[*rate-1];
 endproperty
 
-property RECOVER_AFTER_RESET (out, in, rate);
-    $rose(rstn) |-> ##[1:rate] ($stable(out))[*rate-1];
-endproperty
-
-property SIGNAL_RESETS (signal, rst_val);
-    disable iff (1'b0)
-    (!rstn) |-> (signal == rst_val);
-endproperty
-
 property SIGNAL_IS_POWER_OF_2 (signal);
     ($onehot(signal));
 endproperty
@@ -61,8 +52,6 @@ endproperty
 // Assertions
 AST_VALID_DECIMATOR: assert property (VALID_DECIMATOR(clk_slow, DnI, out, RATE));
 AST_VALID_INTERPOLATOR: assert property (VALID_INTERPOLATOR(DnI, out, RATE));
-AST_RECOVER_AFTER_RESET: assert property (RECOVER_AFTER_RESET(out, in, RATE));
-AST_OUT_RESETS: assert property (SIGNAL_RESETS(out, 0));
 AST_RATE_IS_POWER_OF_2: assert property (SIGNAL_IS_POWER_OF_2(RATE));
 AST_RATE_IS_AT_LEAST_2: assert property (SIGNAL_IS_AT_LEAST_2(RATE));
 
@@ -71,12 +60,27 @@ property SIGNAL_CAN_BE_VALUE (signal, value);
     (signal != value)[*5] ##1 (signal == value);
 endproperty
 
+COV_OUTPUT_CAN_BE_3: cover property (SIGNAL_CAN_BE_VALUE(out, 3));
+
+// Reset checks below
+// There should be "reset -none" and "assume -reset !rstn" in the Jasper tcl file
+property RECOVER_AFTER_RESET (out, in, rate);
+    $rose(rstn) |-> ##[1:rate] ($stable(out))[*rate-1];
+endproperty
+
+property SIGNAL_RESETS (signal, rst_val);
+    disable iff (1'b0)
+    (!rstn) |-> (signal == rst_val);
+endproperty
+
 property NORMAL_RESET_BEHAVIOUR (signal);
     disable iff (1'b0)
     (rstn)[*5] ##1 (signal != 0) ##1 (!rstn) ##[*] (signal != 0);
 endproperty
 
-COV_OUTPUT_CAN_BE_3: cover property (SIGNAL_CAN_BE_VALUE(out, 3));
+AST_RECOVER_AFTER_RESET: assert property (RECOVER_AFTER_RESET(out, in, RATE));
+AST_OUT_RESETS: assert property (SIGNAL_RESETS(out, 0));
+
 COV_NORMAL_RESET_BEHAVIOUR: cover property (NORMAL_RESET_BEHAVIOUR(out));
 
 `endif

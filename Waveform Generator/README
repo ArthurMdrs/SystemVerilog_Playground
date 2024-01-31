@@ -1,0 +1,24 @@
+This module is a waveform generator. It uses a frequency generator to generate an internal clock with a variable frequency. That clock is used to increment a counter, so the counter speed depends on the selected frequency. For each waveform type, we have look-up table with entries that hold the values of the wave for each point in time. The counter is used as a selector for the look-up tables, creating a wavefrom output with a variable frequency. 
+Module ports are described below:
+    - wave_o: output waveform. 
+    - clk: clock.
+    - rst_n: reset (low-active).
+    - freq_sel: frequency selector. Higher value means higher output frequency. 
+    - wave_sel: waveform type selector. Available types: SINE, SAWTOOTH, TRIANGULAR, RECTANGULAR.
+    - halt: halt module's execution (output is frozen).
+    - saw_reverse: if sawtooth wave is selected, it is decreasing instead of increasing. 
+    - rec_duty_cyc: if rectangular wave is selected, determines its duty cycle. The duty cycle (in percentage) follows the equation:
+        D = 100 * (LUT_SIZE - 1) / LUT_SIZE
+        Note you cannot have a D = 100%.
+
+The output frequency depends on the frequency selector input, following the equation:
+    freq_o = freq_i * ((freq_sel + 1) / (LUT_SIZE * 2^SEL_WIDTH))
+    -freq_o: output frequency;
+    -freq_i: clock frequency;
+    -freq_sel: input frequency selector;
+    -SEL_WIDTH: number of bits in freq_sel;
+    -LUT_SIZE: number of entries in the look-up tables.
+
+The minimum value of the output frequency occurs when freq_sel = 0, and the maximum frequency occurs for the maximum value of freq_sel. The maximum output frequency is the input frequency divided by 2*LUT_SIZE.
+
+If you want to change the parameters LUT_WIDTH and/or LUT_SIZE (found in the SV package), the *_lut.sv files will be invalid. Re-generate them using the python scripts found in 'Waveform Generator/py_scripts/'. Keep in mind that I did not test these with different values than they are right now, so you might find bugs.

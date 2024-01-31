@@ -7,8 +7,8 @@ package waveform_gen_pkg;
         RECTANGULAR_WAVE
     } wave_sel_t;
 
-    localparam int LUT_WIDTH = 16;
-    localparam int CNT_WIDTH = $clog2(LUT_WIDTH);
-    localparam int LUT_SIZE  = 16;
+    localparam int LUT_WIDTH = 16;                  // Number of bits in LUT output
+    localparam int CNT_WIDTH = $clog2(LUT_WIDTH);   // Bit for the counter
+    localparam int LUT_SIZE  = 16;                  // Number of entries in the LUT
 
 endpackage

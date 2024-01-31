@@ -1,0 +1,4 @@
+This is a transmitter with the I2S (Inter-IC Sound) protocol. It receives 2 data words, one for the left channel in the MSBs and one for the right channel in the LSBs, then trasmits them through the I2S interface. The interface consists of the signals:
+    - SCLK: bit clock.
+    - WS: word select.
+    - SD: serial data.

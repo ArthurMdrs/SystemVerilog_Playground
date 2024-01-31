@@ -1,0 +1,50 @@
+
+#
+# Mnemonic Maps
+#
+mmap new  -reuse -name {Boolean as Logic} -radix %b -contents {{%c=FALSE -edgepriority 1 -shape low}
+{%c=TRUE -edgepriority 1 -shape high}}
+mmap new  -reuse -name {Example Map} -radix %x -contents {{%b=11???? -bgcolor orange -label REG:%x -linecolor yellow -shape bus}
+{%x=1F -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=2C -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=* -label %x -linecolor gray -shape bus}}
+
+array unset createdGroup
+array set createdGroup {}
+set id [waveform add -signals [subst  {
+	{[format {i2s_transmitter_tb.clk}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {i2s_transmitter_tb.rst_n}]}
+	} ]]
+set id [waveform add -cdivider divider]
+set id [waveform add -signals [subst  {
+	{[format {i2s_transmitter_tb.ready}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {i2s_transmitter_tb.tx_data[15:0]}]}
+	} ]]
+waveform format $id -radix %x
+set id [waveform add -cdivider divider]
+set id [waveform add -signals [subst  {
+	{[format {i2s_transmitter_tb.dut.state[1:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {i2s_transmitter_tb.dut.tx_data_buffer[15:0]}]}
+	} ]]
+set id [waveform add -cdivider divider]
+set id [waveform add -signals [subst  {
+	{[format {i2s_transmitter_tb.SCLK}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {i2s_transmitter_tb.SD}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {i2s_transmitter_tb.WS}]}
+	} ]]
+set id [waveform add -cdivider divider]
+set id [waveform add -signals [subst  {
+	{[format {i2s_transmitter_tb.rcv_data[15:0]}]}
+	} ]]
+
+waveform xview limits 646626ps 783340ps

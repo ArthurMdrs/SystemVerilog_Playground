@@ -56,6 +56,8 @@ database -open -shm -into waves.shm waves -default
 probe -create -database waves i2s_transmitter_tb.clk i2s_transmitter_tb.rst_n i2s_transmitter_tb.ready i2s_transmitter_tb.tx_data i2s_transmitter_tb.SCLK i2s_transmitter_tb.SD i2s_transmitter_tb.WS
 probe -create -database waves i2s_transmitter_tb.dut.tx_data_buffer
 probe -create -database waves i2s_transmitter_tb.dut.state
+probe -create -database waves i2s_transmitter_tb.dut.bit_cnt
+probe -create -database waves i2s_transmitter_tb.dut.delayed_rst_n
 probe -create -database waves i2s_transmitter_tb.rcv_data i2s_transmitter_tb.n_rcv_data
 
 simvision -input simvision.tcl.svcf

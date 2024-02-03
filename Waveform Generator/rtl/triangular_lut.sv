@@ -4,7 +4,7 @@
 
 module triangular_lut #(
     localparam int OUT_WIDTH = 16,
-    localparam int LUT_SIZE = 16,
+    localparam int LUT_SIZE = 32,
     localparam int SEL_WIDTH = $clog2(LUT_SIZE)
 ) (
     output logic signed [OUT_WIDTH-1:0] triangular_o,
@@ -13,27 +13,43 @@ module triangular_lut #(
     input  logic        [SEL_WIDTH-1:0] lut_sel
 );
 
-always_ff @(posedge clk or negedge rst_n) begin
+always_ff @(posedge clk) begin
     if (!rst_n) begin
         triangular_o <= 0;
     end else begin
         case(lut_sel)
             0: triangular_o <= -16'sd32767;
-            1: triangular_o <= -16'sd24575;
-            2: triangular_o <= -16'sd16384;
-            3: triangular_o <= -16'sd8192;
-            4: triangular_o <= 16'sd0;
-            5: triangular_o <= 16'sd8192;
-            6: triangular_o <= 16'sd16384;
-            7: triangular_o <= 16'sd24575;
-            8: triangular_o <= 16'sd32767;
-            9: triangular_o <= 16'sd24575;
-            10: triangular_o <= 16'sd16384;
-            11: triangular_o <= 16'sd8192;
-            12: triangular_o <= 16'sd0;
-            13: triangular_o <= -16'sd8192;
-            14: triangular_o <= -16'sd16384;
-            15: triangular_o <= -16'sd24575;
+            1: triangular_o <= -16'sd28671;
+            2: triangular_o <= -16'sd24575;
+            3: triangular_o <= -16'sd20479;
+            4: triangular_o <= -16'sd16384;
+            5: triangular_o <= -16'sd12288;
+            6: triangular_o <= -16'sd8192;
+            7: triangular_o <= -16'sd4096;
+            8: triangular_o <= 16'sd0;
+            9: triangular_o <= 16'sd4096;
+            10: triangular_o <= 16'sd8192;
+            11: triangular_o <= 16'sd12288;
+            12: triangular_o <= 16'sd16384;
+            13: triangular_o <= 16'sd20479;
+            14: triangular_o <= 16'sd24575;
+            15: triangular_o <= 16'sd28671;
+            16: triangular_o <= 16'sd32767;
+            17: triangular_o <= 16'sd28671;
+            18: triangular_o <= 16'sd24575;
+            19: triangular_o <= 16'sd20479;
+            20: triangular_o <= 16'sd16384;
+            21: triangular_o <= 16'sd12288;
+            22: triangular_o <= 16'sd8192;
+            23: triangular_o <= 16'sd4096;
+            24: triangular_o <= 16'sd0;
+            25: triangular_o <= -16'sd4096;
+            26: triangular_o <= -16'sd8192;
+            27: triangular_o <= -16'sd12288;
+            28: triangular_o <= -16'sd16384;
+            29: triangular_o <= -16'sd20479;
+            30: triangular_o <= -16'sd24575;
+            31: triangular_o <= -16'sd28671;
         endcase
     end
 end

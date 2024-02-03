@@ -8,7 +8,7 @@ package waveform_gen_pkg;
     } wave_sel_t;
 
     localparam int LUT_WIDTH = 16;                  // Number of bits in LUT output
-    localparam int CNT_WIDTH = $clog2(LUT_WIDTH);   // Bit for the counter
-    localparam int LUT_SIZE  = 16;                  // Number of entries in the LUT
+    localparam int LUT_SIZE  = 32;                  // Number of entries in the LUT
+    localparam int CNT_WIDTH = $clog2(LUT_SIZE);   // Number of bits in the counter
 
 endpackage

@@ -1,5 +1,5 @@
 
-PKG= ../rtl/pkg/*.sv
+PKG = 
 RTL = ../rtl/*.sv
 TB = ./*.sv
 TOP = -top i2s_transmitter_tb

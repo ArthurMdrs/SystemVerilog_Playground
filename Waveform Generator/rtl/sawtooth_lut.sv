@@ -4,7 +4,7 @@
 
 module sawtooth_lut #(
     localparam int OUT_WIDTH = 16,
-    localparam int LUT_SIZE = 16,
+    localparam int LUT_SIZE = 32,
     localparam int SEL_WIDTH = $clog2(LUT_SIZE)
 ) (
     output logic signed [OUT_WIDTH-1:0] sawtooth_o,
@@ -17,27 +17,43 @@ module sawtooth_lut #(
 logic [SEL_WIDTH-1:0] sawtooth_sel;
 assign sawtooth_sel = (reverse) ? ~lut_sel : lut_sel;
 
-always_ff @(posedge clk or negedge rst_n) begin
+always_ff @(posedge clk) begin
     if (!rst_n) begin
         sawtooth_o <= 0;
     end else begin
         case(sawtooth_sel)
             0: sawtooth_o <= 16'sd0;
-            1: sawtooth_o <= 16'sd4096;
-            2: sawtooth_o <= 16'sd8192;
-            3: sawtooth_o <= 16'sd12288;
-            4: sawtooth_o <= 16'sd16384;
-            5: sawtooth_o <= 16'sd20479;
-            6: sawtooth_o <= 16'sd24575;
-            7: sawtooth_o <= 16'sd28671;
-            8: sawtooth_o <= 16'sd32767;
-            9: sawtooth_o <= -16'sd28671;
-            10: sawtooth_o <= -16'sd24575;
-            11: sawtooth_o <= -16'sd20479;
-            12: sawtooth_o <= -16'sd16384;
-            13: sawtooth_o <= -16'sd12288;
-            14: sawtooth_o <= -16'sd8192;
-            15: sawtooth_o <= -16'sd4096;
+            1: sawtooth_o <= 16'sd2048;
+            2: sawtooth_o <= 16'sd4096;
+            3: sawtooth_o <= 16'sd6144;
+            4: sawtooth_o <= 16'sd8192;
+            5: sawtooth_o <= 16'sd10240;
+            6: sawtooth_o <= 16'sd12288;
+            7: sawtooth_o <= 16'sd14336;
+            8: sawtooth_o <= 16'sd16384;
+            9: sawtooth_o <= 16'sd18431;
+            10: sawtooth_o <= 16'sd20479;
+            11: sawtooth_o <= 16'sd22527;
+            12: sawtooth_o <= 16'sd24575;
+            13: sawtooth_o <= 16'sd26623;
+            14: sawtooth_o <= 16'sd28671;
+            15: sawtooth_o <= 16'sd30719;
+            16: sawtooth_o <= 16'sd32767;
+            17: sawtooth_o <= -16'sd30719;
+            18: sawtooth_o <= -16'sd28671;
+            19: sawtooth_o <= -16'sd26623;
+            20: sawtooth_o <= -16'sd24575;
+            21: sawtooth_o <= -16'sd22527;
+            22: sawtooth_o <= -16'sd20479;
+            23: sawtooth_o <= -16'sd18431;
+            24: sawtooth_o <= -16'sd16384;
+            25: sawtooth_o <= -16'sd14336;
+            26: sawtooth_o <= -16'sd12288;
+            27: sawtooth_o <= -16'sd10240;
+            28: sawtooth_o <= -16'sd8192;
+            29: sawtooth_o <= -16'sd6144;
+            30: sawtooth_o <= -16'sd4096;
+            31: sawtooth_o <= -16'sd2048;
         endcase
     end
 end

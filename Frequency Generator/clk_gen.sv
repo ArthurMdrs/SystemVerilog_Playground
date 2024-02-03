@@ -22,7 +22,7 @@ module clk_gen #(
 
 logic [SEL_WIDTH:0] accum;
 
-always_ff @(posedge clk_i or negedge rst_n) begin
+always_ff @(posedge clk_i) begin
     if (!rst_n) begin
         accum <= '0;
     end else begin

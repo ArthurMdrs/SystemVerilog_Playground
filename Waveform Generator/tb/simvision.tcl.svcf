@@ -80,6 +80,9 @@ set id [waveform add -signals [subst  {
 	} ]]
 waveform format $id -radix %d -trace analogSampleAndHold
 waveform axis range $id -for default -min -32767 -max 32767 -scale linear
+set id [waveform add -signals [subst  {
+	{simulator::[format {waveform_gen_tb.wave_sel}]}
+	} ]]
 
 waveform xview limits 0 102000ps
 

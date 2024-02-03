@@ -47,7 +47,7 @@ alias . run
 alias indago verisium
 alias quit exit
 database -open -shm -into waves.shm waves -default
-probe -create -database waves waveform_gen_tb.clk waveform_gen_tb.dut.my_cnt waveform_gen_tb.wave_o
+probe -create -database waves waveform_gen_tb.clk waveform_gen_tb.dut.my_cnt waveform_gen_tb.wave_o waveform_gen_tb.wave_sel
 probe -create -database waves waveform_gen_tb.dut.clk_gen_inst.clk_o
 probe -create -database waves waveform_gen_tb.dut.clk_gen_inst.accum
 

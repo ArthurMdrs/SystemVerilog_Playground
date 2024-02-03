@@ -83,18 +83,18 @@ module waveform_gen_tb;
         wave_sel = SINE_WAVE;
         prev_wave_type = wave_sel.next();
 
-        test_sel = HALT;
+        test_sel = DIFF_FREQS;
 
         case (test_sel)
             ALL_WAVE_TYPES: 
                 test_all_wave_types (get_expected_freq ());
             DIFF_FREQS: // We get frequency errors in this, but graphically seems fine
-                test_different_freqs (SINE_WAVE);
+                test_different_freqs (TRIANGULAR_WAVE);
             RECT_DUTY_CYCLE: 
                 test_different_duty_cycles (get_expected_freq ());
             SAW_REVERSE:
                 test_saw_reverse(get_expected_freq ());
-            HALT:
+            HALT: // We can expect to get frequency errors in this
                 test_halt(get_expected_freq ());
         endcase
 

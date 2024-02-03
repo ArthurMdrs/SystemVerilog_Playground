@@ -31,7 +31,7 @@ clk_gen #(
 
 // The counter below will be used as input to the LUTs
 logic [CNT_WIDTH-1:0] my_cnt;
-always @(clk_o or !rst_n) begin // Make it level-sensitive to not lose frequency
+always @(clk_o) begin // Make it level-sensitive to not lose frequency
     if (!rst_n) begin
         my_cnt <= 0;
     end else begin

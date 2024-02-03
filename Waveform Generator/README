@@ -21,4 +21,4 @@ The output frequency depends on the frequency selector input, following the equa
 
 The minimum value of the output frequency occurs when freq_sel = 0, and the maximum frequency occurs for the maximum value of freq_sel. The maximum output frequency is the input frequency divided by 2*LUT_SIZE.
 
-If you want to change the parameters LUT_WIDTH and/or LUT_SIZE (found in the SV package), the *_lut.sv files will be invalid. Re-generate them using the python scripts found in 'Waveform Generator/py_scripts/'. Keep in mind that I did not test these with different values than they are right now, so you might find bugs.
+If you want to change the parameters LUT_WIDTH and/or LUT_SIZE (found in the SV package), the *_lut.sv files will be invalid. Re-generate them using the python scripts found in 'Waveform Generator/py_scripts/'. I only tested with LUT_SIZE = 16 and 32.

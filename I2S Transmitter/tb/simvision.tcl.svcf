@@ -88,6 +88,9 @@ set id [waveform add -signals [subst  {
 set id [waveform add -signals [subst  {
 	{simulator::[format {i2s_transmitter_tb.rst_n}]}
 	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {i2s_transmitter_tb.dut.delayed_rst_n}]}
+	} ]]
 set id [waveform add -cdivider divider]
 set id [waveform add -signals [subst  {
 	{simulator::[format {i2s_transmitter_tb.ready}]}
@@ -97,10 +100,13 @@ set id [waveform add -signals [subst  {
 	} ]]
 set id [waveform add -cdivider divider]
 set id [waveform add -signals [subst  {
-	{simulator::[format {i2s_transmitter_tb.dut.state[1:0]}]}
+	{simulator::[format {i2s_transmitter_tb.dut.state}]}
 	} ]]
 set id [waveform add -signals [subst  {
 	{simulator::[format {i2s_transmitter_tb.dut.tx_data_buffer[15:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {i2s_transmitter_tb.dut.bit_cnt[3:0]}]}
 	} ]]
 set id [waveform add -cdivider divider]
 set id [waveform add -signals [subst  {
@@ -117,7 +123,7 @@ set id [waveform add -signals [subst  {
 	{simulator::[format {i2s_transmitter_tb.rcv_data[15:0]}]}
 	} ]]
 
-waveform xview limits 0 146528ps
+waveform xview limits 0 75000ps
 
 #
 # Waveform Window Links

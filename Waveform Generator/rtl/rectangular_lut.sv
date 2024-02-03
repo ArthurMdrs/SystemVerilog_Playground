@@ -4,7 +4,7 @@
 
 module rectangular_lut #(
     localparam int OUT_WIDTH = 16,
-    localparam int LUT_SIZE = 16,
+    localparam int LUT_SIZE = 32,
     localparam int SEL_WIDTH = $clog2(LUT_SIZE)
 ) (
     output logic signed [OUT_WIDTH-1:0] rectangular_o,
@@ -14,7 +14,7 @@ module rectangular_lut #(
     input  logic        [SEL_WIDTH-1:0] duty_cycle
 );
 
-always_ff @(posedge clk or negedge rst_n) begin
+always_ff @(posedge clk) begin
     if (!rst_n) begin
         rectangular_o <= 0;
     end else begin

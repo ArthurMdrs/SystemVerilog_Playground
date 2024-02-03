@@ -4,9 +4,6 @@ module i2s_transmitter_tb;
 timeunit 1ns;
 timeprecision 1ps;
 
-// Import packages
-import i2s_transmitter_pkg::*;
-
 // DUT parameters
 localparam int DWIDTH = 8;
 
@@ -85,21 +82,17 @@ initial begin
 end
 
 // Update value of received data
-always_ff @(posedge clk or negedge rst_n) begin
+always_ff @(posedge SCLK) begin
     if(!rst_n)
         n_rcv_data <= '0;
     else 
         n_rcv_data <= {n_rcv_data, SD};
 end
-// always_ff @(negedge clk or negedge rst_n) begin
-//     if(!rst_n)
-//         n_rcv_data <= '0;
-//     else 
-//         n_rcv_data <= {n_rcv_data, SD};
-// end
 
-// When WS goes low, we got a full pair of data words, so print it
+// When WS goes low (except on reset), wait 1 more cycle until
+// we get the entire 2 data words. Then print them
 always @(negedge WS iff (rst_n)) begin
+    @(negedge SCLK);
     rcv_data = n_rcv_data;
     checkit(data_mem[recv_idx], rcv_data);
     recv_idx++;

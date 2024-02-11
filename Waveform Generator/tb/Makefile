@@ -1,8 +1,8 @@
 
-PKG = 
+PKG = ../rtl/pkg/*.sv
 RTL = ../rtl/*.sv
 TB = ./*.sv
-TOP = -top i2s_transmitter_tb
+TOP = -top waveform_gen_tb
 
 SEED = 1
 
@@ -10,7 +10,7 @@ run: sim
 
 sim:
 	xrun -64bit -sv $(PKG) $(TB) $(RTL) $(TOP) \
-		 -timescale 1ns/1ns -access +rwc +SVSEED=$(SEED)
+		 -timescale 1ns/1ps -access +rwc +SVSEED=$(SEED)
 
 gui:
 	xrun -64bit -sv $(PKG) $(TB) $(RTL) $(TOP) \

@@ -102,8 +102,9 @@ end
 //=============== Tasks and Functions - Begin ===============//
 
 task reset ();
-    rst_n = 0;
-    #3 rst_n = 1;
+    rst_n = 1;
+    @(negedge clk) rst_n = 0;
+    @(negedge clk) rst_n = 1;
     $display("%t: Reset done.", $realtime);
 endtask
 

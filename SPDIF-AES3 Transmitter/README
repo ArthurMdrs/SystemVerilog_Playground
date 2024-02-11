@@ -1,0 +1,12 @@
+References used (accessed on Feb 11th, 2024):
+- https://tech.ebu.ch/docs/tech/tech3250.pdf
+- https://en.wikipedia.org/wiki/AES3
+
+
+
+TO DO:
+
+- Implement channel status bit
+- Implement a monophonic mode 
+In monophonic mode the transmitted bit rate shall remain at the normal 2-channel rate and the audio sample word shall be placed in sub-frame 1. Time slots 4 to 31 of sub-frame 2 shall either carry the identical bits to sub-frame 1 or shall be set to logic '0'. A receiver shall normally default to channel 1 unless manual override is provided.
+- Fix the preamble driver.

@@ -5,7 +5,7 @@
 #
 # You can restore this configuration with:
 #
-#      xrun -64bit -sv ../rtl/pkg/spdif_aes3_transmitter_pkg.sv ./spdif_aes3_transmitter_tb.sv ../rtl/Untitled-1.sv ../rtl/spdif_aes3_transmitter.sv -top spdif_aes3_transmitter_tb -timescale 1ns/1ns -access +rwc +SVSEED=1 -s -input /home/pedro.medeiros/SystemVerilog_Playground/SPDIF-AES3 Transmitter/tb/simvision.tcl
+#      xrun -64bit -sv -timescale 1ns/1ns ../rtl/pkg/spdif_aes3_transmitter_pkg.sv ./spdif_aes3_transmitter_tb.sv ../rtl/spdif_aes3_transmitter.sv -top spdif_aes3_transmitter_tb -access +rwc +SVSEED=1 +define+SVA_ON +define+SIM -input simvision.tcl -input /home/pedro.medeiros/SystemVerilog_Playground/SPDIF-AES3 Transmitter/tb/simvision.tcl
 #
 
 set tcl_prompt1 {puts -nonewline "xcelium> "}
@@ -60,5 +60,7 @@ probe -create -database waves spdif_aes3_transmitter_tb.dut.audio_data_L spdif_a
 probe -create -database waves spdif_aes3_transmitter_tb.dut.unmblk1.temp_var spdif_aes3_transmitter_tb.dec_clk spdif_aes3_transmitter_tb.dec_data spdif_aes3_transmitter_tb.dec_sample
 probe -create -database waves spdif_aes3_transmitter_tb.tx_o_valid
 probe -create -database waves spdif_aes3_transmitter_tb.dec_vld spdif_aes3_transmitter_tb.dec_usr spdif_aes3_transmitter_tb.dec_ch spdif_aes3_transmitter_tb.dec_par
+probe -create -database waves spdif_aes3_transmitter_tb.dut.next_L spdif_aes3_transmitter_tb.dut.next_R
+probe -create -database waves spdif_aes3_transmitter_tb.dut.parity
 
 simvision -input simvision.tcl.svcf

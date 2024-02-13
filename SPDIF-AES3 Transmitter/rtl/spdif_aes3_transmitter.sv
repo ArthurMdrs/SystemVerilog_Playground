@@ -26,6 +26,10 @@ logic [SAMPLE_WIDTH-1:0] sample_buffer_R; // Right (or B) channel sample
 subframe_t subframe_which;  // Subframe is left or right?
 preamble_t preamble;        // See related SV package
 
+// Next audio bit to be transmitted
+wire next_L = audio_data_L[(bit_cnt - 8) / 2];
+wire next_R = audio_data_R[(bit_cnt - 8) / 2];
+
 ////////////////////////////////
 ////    SUBFRAME COUNTER    ////
 ////////////////////////////////
@@ -33,7 +37,7 @@ preamble_t preamble;        // See related SV package
 // 192 x 2 = 384 subframes
 always_ff @(posedge clk) begin
     if(!rst_n) begin
-        subframe_cnt <= '1;
+        subframe_cnt <= 383;
         subframe_which <= RIGHT;
     end
     else if (!halt && bit_cnt == 63) begin
@@ -86,35 +90,27 @@ end
 //////////////////////////////////////
 ////    DETERMINE THE PREAMBLE    ////
 //////////////////////////////////////
-
-// The counter below IGNORE
-// logic [$clog2(SAMPLE_WIDTH)-1:0] buff_cnt;
-
-// CODE BELOW IS INCOMPLETE!!
 always_ff @(posedge clk) begin
     if(!rst_n) begin
         preamble <= RESET;
     end
     else if (!halt && bit_cnt == 63) begin
-    if (subframe_cnt == '1)             // Start of audio block (preamble Z)
-        if (tx_o)
-            preamble <= PREAMBLE_Z_1;
+    if (subframe_cnt == 383)            // Start of audio block (preamble Z)
+        if (parity == 1'b1)
+            preamble <= (tx_o) ? PREAMBLE_Z_0 : PREAMBLE_Z_1;
         else
-            preamble <= PREAMBLE_Z_0;
+            preamble <= (tx_o) ? PREAMBLE_Z_1 : PREAMBLE_Z_0;
     else if (subframe_cnt[0] == 1'b1)   // Left channel (or A channel)
-        if (tx_o)
-            preamble <= PREAMBLE_X_1;
+        if (parity == 1'b1)
+            preamble <= (tx_o) ? PREAMBLE_X_0 : PREAMBLE_X_1;
         else
-            preamble <= PREAMBLE_X_0;
+            preamble <= (tx_o) ? PREAMBLE_X_1 : PREAMBLE_X_0;
     else                                // Right channel (or B channel)
-        if (tx_o)
-            preamble <= PREAMBLE_Y_1;
+        if (parity == 1'b1)
+            preamble <= (tx_o) ? PREAMBLE_Y_0 : PREAMBLE_Y_1;
         else
-            preamble <= PREAMBLE_Y_0;
+            preamble <= (tx_o) ? PREAMBLE_Y_1 : PREAMBLE_Y_0;
     end
-
-
-
 end
 
 /////////////////////////////////////
@@ -151,7 +147,6 @@ end
 ////    OUTPUT BIT    ////
 //////////////////////////
 always_ff @(posedge clk) begin
-    int temp_var;
     if(!rst_n) begin
         tx_o <= 1'b0;
     end
@@ -160,12 +155,11 @@ always_ff @(posedge clk) begin
             tx_o <= preamble[bit_cnt[2:0]];
         end
         else if (bit_cnt < 56) begin // We are in the audio data region
-            temp_var = (bit_cnt - 8) / 2;
             if (force_toggle)
                 tx_o <= !tx_o;
-            else if (subframe_which == LEFT && audio_data_L[temp_var] == 1'b1)
+            else if (subframe_which == LEFT && next_L == 1'b1)
                 tx_o <= !tx_o;
-            else if (subframe_which == RIGHT && audio_data_R[temp_var] == 1'b1)
+            else if (subframe_which == RIGHT && next_R == 1'b1)
                 tx_o <= !tx_o;
             else
                 tx_o <=  tx_o;
@@ -195,7 +189,6 @@ end
 ////    PARITY BIT    ////
 //////////////////////////
 always_ff @(posedge clk) begin
-    int temp_var;
     if(!rst_n) begin
         parity_cnt <= '0;
     end
@@ -205,11 +198,10 @@ always_ff @(posedge clk) begin
         end
         else if (bit_cnt < 56) begin // We are in the audio data region
             // Don't account for forced transitions
-            temp_var = (bit_cnt - 8) / 2;
             if (!force_toggle)
-                if (subframe_which == LEFT && audio_data_L[temp_var] == 1'b1)
+                if (subframe_which == LEFT && next_L == 1'b1)
                     parity_cnt <= parity_cnt + 1;
-                else if (subframe_which == RIGHT && audio_data_R[temp_var] == 1'b1)
+                else if (subframe_which == RIGHT && next_R == 1'b1)
                     parity_cnt <= parity_cnt + 1;
         end
         else if (bit_cnt == 61) begin // This is the channel status bit
@@ -224,15 +216,9 @@ assign parity = parity_cnt[0];
 //////////////////////////////////
 ////    CHANNEL STATUS BIT    ////
 //////////////////////////////////
-// THIS IS NOT IMPLEMENTED YET!!
-assign ch_bit = 1;
+// THIS IS NOT IMPLEMENTED!!
+assign ch_bit = 0;
 
-
-
-
-
-wire next_L = audio_data_L[(bit_cnt - 8) / 2];
-wire next_R = audio_data_R[(bit_cnt - 8) / 2];
 
 
 `ifdef SVA_ON

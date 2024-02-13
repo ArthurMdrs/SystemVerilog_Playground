@@ -1,12 +1,17 @@
+This is a transmitter that follows the S/PDIF or AES3 standard (they only differ in the channel status bit). It transmits one audio block at a time. An audio block is made up of 192 frames, each frame corresponding to an audio sample. Each frame has 2 subframes, usually corresponding to left and right audio channels. A subframe has the following structure: 
+
+- Bits 0-3: preamble.
+- Bits 4-7: auxiliary sample bits.
+- Bits 8-27: audio sample bits.
+- Bit 28: validity bit.
+- Bit 29: user data bit.
+- Bit 30: channel status bit.
+- Bit 31: parity bit.
+
+Except for the preamble, all bits are encoded with the Differential Manchester encoding method, also called biphase mark code (BMC). Data is transmitted serially with LSB first.
+
+The channel status bit is always considered 0. A more robust implementation would transmit the apropriate data through this bit.          
+
 References used (accessed on Feb 11th, 2024):
 - https://tech.ebu.ch/docs/tech/tech3250.pdf
 - https://en.wikipedia.org/wiki/AES3
-
-
-
-TO DO:
-
-- Implement channel status bit
-- Implement a monophonic mode 
-In monophonic mode the transmitted bit rate shall remain at the normal 2-channel rate and the audio sample word shall be placed in sub-frame 1. Time slots 4 to 31 of sub-frame 2 shall either carry the identical bits to sub-frame 1 or shall be set to logic '0'. A receiver shall normally default to channel 1 unless manual override is provided.
-- Fix the preamble driver.

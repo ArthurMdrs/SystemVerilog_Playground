@@ -37,17 +37,19 @@ int block_cycles = 192*32*2*2;
 int audio_blk_idx;
 int chk_idx;
 int parity_cnt;
+bit got_sop;
+int rpt_amt = 10*192;
 
 typedef logic [0:191] [2*SAMPLE_WIDTH-1:0] audio_block_t;
 audio_block_t audio_block;
 
 // Clock 
 localparam int PERIOD = 2;
-localparam int MAX_CYCLES = 10_000;
+localparam int MAX_CYCLES = 1_000_000;
 initial begin
     clk = 0; 
-    // repeat(MAX_CYCLES) #(PERIOD/2) clk = ~clk;
-    forever #(PERIOD/2) clk = ~clk;
+    repeat(MAX_CYCLES) #(PERIOD/2) clk = ~clk;
+    // forever #(PERIOD/2) clk = ~clk;
     $display ("Simulation reached the time limit. Terminating simulation.");
     $finish;
 end
@@ -57,6 +59,7 @@ localparam int DEC_CLK_PERIOD = 2*PERIOD;
 logic dec_clk, dec_data, dec_vld, dec_usr, dec_ch, dec_par;
 logic tx_o_valid;
 logic [47:0] dec_sample;
+preamble_t dec_preamble;
 
 // The proccess
 initial begin
@@ -76,27 +79,30 @@ initial begin
 
     fork
     // Drive the input data sample
-    repeat(block_cycles) begin
-        if (ready) begin
-            sample_i = audio_block[audio_blk_idx];
-            audio_blk_idx++;
-        end
+    repeat(rpt_amt) begin
+        wait(ready);
+        sample_i = audio_block[audio_blk_idx];
+        audio_blk_idx++;
         if (audio_blk_idx == 192)
             audio_blk_idx = 0;
-        @(negedge clk);
+        wait(!ready);
     end
     // Read the output data stream and check it
-    repeat(192+1) begin
+    repeat(rpt_amt) begin
         detect_preamble(); // Subframe 1
+        check_preamble();
         read_data();
         check_parity();
         detect_preamble(); // Subframe 2
+        check_preamble();
         read_data();
         check_parity();
-        checkit(audio_block[chk_idx], dec_sample);
+        check_data(audio_block[chk_idx], dec_sample);
         chk_idx++;
+        if (chk_idx == 192)
+            chk_idx = 0;
     end
-    join    
+    join
 
     $display("%t: Simulation end. Number of mismatches: %0d.", $time, n_mismatches);
 
@@ -113,7 +119,7 @@ task reset ();
     $display("%t: Reset done.", $realtime);
 endtask
 
-task checkit (logic [2*SAMPLE_WIDTH-1:0] expected, logic [47:0] actual);
+task check_data (logic [2*SAMPLE_WIDTH-1:0] expected, logic [47:0] actual);
     logic [47:0] exp_;
 
     case (SAMPLE_WIDTH)
@@ -124,18 +130,17 @@ task checkit (logic [2*SAMPLE_WIDTH-1:0] expected, logic [47:0] actual);
     endcase
 
     if (actual != exp_) begin
-        $display("%t: ERROR! Expected = %0h. Actual = %0h.", $time, expected, exp_);
+        $display("%t: ERROR! Expected = %0h. Actual = %0h.", $time, exp_, actual);
         n_mismatches++;
     end
 endtask
 
 task detect_preamble;
-    preamble_t preamble_read;
     logic [7:0] aux;
     logic got_preamble;
 
     aux = '0;
-    preamble_read = RESET;
+    dec_preamble = RESET;
     got_preamble = 0;
     while (!got_preamble) begin
         @(negedge clk);
@@ -144,12 +149,12 @@ task detect_preamble;
                         PREAMBLE_Y_0, PREAMBLE_Y_1, 
                         PREAMBLE_X_0, PREAMBLE_X_1}) 
         begin
-            preamble_read = preamble_t'(aux);
+            dec_preamble = preamble_t'(aux);
             got_preamble = 1;
         end
     end
     if (verbose)
-        $display("%t: Got preamble %s.", $time, preamble_read.name());
+        $display("%t: Got preamble %s.", $time, dec_preamble.name());
 endtask
 
 task read_data;
@@ -174,7 +179,6 @@ fork
             parity_cnt = parity_cnt + dec_data;
             tx_o_valid = 1;
         end
-        // dec_vld, dec_usr, dec_ch, dec_par
         // Decode validity bit
         @(negedge clk) temp = tx_o;
         @(negedge clk) dec_vld = (tx_o != temp);
@@ -196,11 +200,28 @@ fork
 join
 endtask
 
-task check_parity ();
+task check_parity;
     // if (parity_cnt[0] != 1'b0) begin
     if (parity_cnt % 2 == 1'b1) begin
         $display("%t: PARITY ERROR.", $realtime);
         n_mismatches++;
+    end
+endtask
+
+task check_preamble;    
+    if (chk_idx == 0 && !got_sop) begin
+        if (!(dec_preamble inside {PREAMBLE_Z_0, PREAMBLE_Z_1})) begin
+            $display("%t: ERROR! Expected preamble Z. Got = %s.", $time, dec_preamble.name());
+            n_mismatches++;
+        end
+        else got_sop = 1;
+    end
+    else begin
+        if (!(dec_preamble inside {PREAMBLE_Y_0, PREAMBLE_Y_1, PREAMBLE_X_0, PREAMBLE_X_1})) begin
+            $display("%t: ERROR! Expected preamble X or Y. Got = %s.", $time, dec_preamble.name());
+            n_mismatches++;
+        end
+        got_sop = 0;
     end
 endtask
 

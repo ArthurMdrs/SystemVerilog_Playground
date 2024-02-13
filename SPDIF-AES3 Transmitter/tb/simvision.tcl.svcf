@@ -1,10 +1,10 @@
-# SimVision Command Script (Sun Feb 11 09:59:43 -03 2024)
+# SimVision Command Script (Sun Feb 11 13:42:20 -03 2024)
 #
 # Version 23.09.s003
 #
 # You can restore this configuration with:
 #
-#      xrun -64bit -sv ../rtl/pkg/spdif_aes3_transmitter_pkg.sv ./spdif_aes3_transmitter_tb.sv ../rtl/Untitled-1.sv ../rtl/spdif_aes3_transmitter.sv -top spdif_aes3_transmitter_tb -timescale 1ns/1ns -access +rwc +SVSEED=1 -s -input /home/pedro.medeiros/SystemVerilog_Playground/SPDIF-AES3 Transmitter/tb/simvision.tcl
+#      xrun -64bit -sv -timescale 1ns/1ns ../rtl/pkg/spdif_aes3_transmitter_pkg.sv ./spdif_aes3_transmitter_tb.sv ../rtl/spdif_aes3_transmitter.sv -top spdif_aes3_transmitter_tb -access +rwc +SVSEED=1 +define+SVA_ON +define+SIM -input simvision.tcl -input /home/pedro.medeiros/SystemVerilog_Playground/SPDIF-AES3 Transmitter/tb/simvision.tcl
 #
 
 
@@ -39,7 +39,7 @@ preferences set toolbar-TimeSearch-WatchWindow {
 # Simulator
 #
 database require simulator -hints {
-	simulator "xrun -64bit -sv ../rtl/pkg/spdif_aes3_transmitter_pkg.sv ./spdif_aes3_transmitter_tb.sv ../rtl/Untitled-1.sv ../rtl/spdif_aes3_transmitter.sv -top spdif_aes3_transmitter_tb -timescale 1ns/1ns -access +rwc +SVSEED=1 -gui -s -input simvision.tcl"
+	simulator "xrun -64bit -sv -timescale 1ns/1ns ../rtl/pkg/spdif_aes3_transmitter_pkg.sv ./spdif_aes3_transmitter_tb.sv ../rtl/spdif_aes3_transmitter.sv -top spdif_aes3_transmitter_tb -access +rwc +SVSEED=1 +define+SVA_ON +define+SIM -gui -input simvision.tcl -input simvision.tcl"
 }
 
 #
@@ -66,11 +66,12 @@ timerange new -name {70ns : 207ns} -start 70ns -end 207ns
 if {[catch {window new WatchList -name "Design Browser 1" -geometry 730x500+261+33}] != ""} {
     window geometry "Design Browser 1" 730x500+261+33
 }
+window target "Design Browser 1" on
 browser using {Design Browser 1}
-browser set -scope [subst  {simulator::[format {spdif_aes3_transmitter_tb}]} ]
+browser set -scope [subst  {simulator::[format {spdif_aes3_transmitter_tb.dut}]} ]
 browser set \
     -signalsort name
-browser yview see [subst  {simulator::[format {spdif_aes3_transmitter_tb}]} ]
+browser yview see [subst  {simulator::[format {spdif_aes3_transmitter_tb.dut}]} ]
 browser timecontrol set -lock 0
 
 #
@@ -122,6 +123,9 @@ set id [waveform add -signals [subst  {
 	} ]]
 waveform format $id -radix %d
 set id [waveform add -signals [subst  {
+	{simulator::[format {spdif_aes3_transmitter_tb.dut.parity}]}
+	} ]]
+set id [waveform add -signals [subst  {
 	{simulator::[format {spdif_aes3_transmitter_tb.dut.preamble}]}
 	} ]]
 set id [waveform add -signals [subst  {
@@ -166,8 +170,9 @@ set id [waveform add -signals [subst  {
 set id [waveform add -signals [subst  {
 	{simulator::[format {spdif_aes3_transmitter_tb.dec_par}]}
 	} ]]
+set id [waveform add -cdivider divider]
 
-waveform xview limits 137960ps 275920ps
+waveform xview limits 55184ps 193144ps
 
 #
 # Waveform Window Links

@@ -4,7 +4,7 @@ RTL = ../rtl/*.sv
 TB = ./*.sv
 TOP = -top spdif_aes3_transmitter_tb
 
-SEED = 1
+SEED = random
 
 run: sim
 

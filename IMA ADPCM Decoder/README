@@ -1,0 +1,35 @@
+Readme.
+
+https://forum.microchip.com/s/topic/a5C3l000000MLYREA4/t312915
+
+I created an IMA ADPCM file with Audacity with continuous tone on it. I took apart the WAVE header and found the following:
+ 
+In the fmt chunk:
+  Encode type: 0x0011 (IMA ADPCM)
+  Channels: 0x0001
+  Sample Rate: 0x0000ac44 (44.1kHz)
+  Byte Rate: 0x00005647 (22087)
+  Block Align: 0x0800 (2048 bytes per block)
+  Bits/Sample: 0x0004
+  Samples/block 0x0ff9 (4089)
+ 
+Each block starts with a header consisting of the following 4 bytes:
+  16 bit audio sample (2 bytes, little endian)
+  8 bit step table index
+  dummy byte (set to zero)
+ 
+Note that we encode two samples per byte, but there are an odd number (4089) samples per block. One of the samples is in the ADPCM block header. So, a block looks like this:
+4 bytes - Block header including one sample
+2044 bytes with 4088 samples
+Total of 4089 samples per block.
+
+
+https://wiki.multimedia.cx/index.php/WAVEFORMATEX
+bytes 0-1    wFormat
+bytes 2-3    nChannels
+bytes 4-7    nSamplesPerSec
+bytes 8-11   nAvgBytesPerSec
+bytes 12-13  nBlockAlign
+bytes 14-15  wBitsPerSample
+bytes 16-17  cbSize
+bytes 18..   extradata [actual number of bytes is determined by cbSize field]

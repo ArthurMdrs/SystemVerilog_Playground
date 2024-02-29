@@ -8,7 +8,7 @@ timeprecision 1ps;
 import spdif_aes3_transmitter_pkg::*;
 
 // DUT parameters
-localparam int SAMPLE_WIDTH = 24;
+localparam int SAMPLE_WIDTH = 16;
 
 // DUT signals
 logic clk;
@@ -76,6 +76,7 @@ initial begin
     dec_sample = '0;
 
     assert (randomize (audio_block));
+    audio_block[0] = 32'h042f_042f;
 
     fork
     // Drive the input data sample

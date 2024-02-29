@@ -2,20 +2,27 @@ import sys
 import os
 import shutil
 
-folder_name = sys.argv[1]
+# folder_name = sys.argv[1]
+if len(sys.argv) > 1:
+    folder_name = sys.argv[1]
+else:
+    folder_name = "New Folder"
 
 if len(sys.argv) > 2:
     design_name = sys.argv[2]
 else:
     design_name = "stub"
-
-module_str  = "module "+design_name+" #(\n"
-module_str += "    \n"
-module_str += ") (\n"
-module_str += "    \n"
-module_str += ");\n"
-module_str += "\n\n\n"
-module_str += "endmodule\n"
+    
+module_str = f'''module {design_name} #(
+    
+) (
+    
+);
+    
+    
+    
+endmodule
+'''
 
 tb_str = f'''module {design_name}_tb;
 
@@ -31,6 +38,11 @@ timeprecision 1ps;
 // DUT signals
 
 // The DUT
+{design_name} #(
+    
+) dut (
+    
+);
 
 // Simulation variables
 int n_mismatches;
@@ -84,7 +96,7 @@ endtask
 endmodule'''
 
 makefile_str = f'''
-PKG = ../rtl/pkg/*.sv
+#PKG = ../rtl/pkg/*.sv
 RTL = ../rtl/*.sv
 TB = ./*.sv
 TOP = -top {design_name}_tb

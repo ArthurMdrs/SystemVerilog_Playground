@@ -64,3 +64,5 @@ probe -create -database waves spdif_aes3_transmitter_tb.dut.next_L spdif_aes3_tr
 probe -create -database waves spdif_aes3_transmitter_tb.dut.parity
 
 simvision -input simvision.tcl.svcf
+
+run

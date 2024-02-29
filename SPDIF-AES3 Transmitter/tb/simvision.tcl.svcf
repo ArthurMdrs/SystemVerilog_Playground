@@ -59,6 +59,7 @@ timerange new -name {0 : 20ns} -start 0 -end 20ns
 timerange new -name {0 : 256,000ps} -start 0 -end 256000ps
 timerange new -name {0 : 137,960ps} -start 0 -end 137960ps
 timerange new -name {70ns : 207ns} -start 70ns -end 207ns
+timerange new -name {preamb+data} -start 7ns -end 119ns
 
 #
 # Design Browser windows
@@ -87,9 +88,9 @@ waveform set \
     -primarycursor TimeA \
     -signalnames name \
     -signalwidth 175 \
-    -units ps \
+    -units ns \
     -valuewidth 106
-waveform baseline set -time 253,937ps
+waveform baseline set -time 23ns
 
 set id [waveform add -signals [subst  {
 	{simulator::[format {spdif_aes3_transmitter_tb.clk}]}
@@ -172,7 +173,7 @@ set id [waveform add -signals [subst  {
 	} ]]
 set id [waveform add -cdivider divider]
 
-waveform xview limits 55184ps 193144ps
+waveform xview limits 7 119ns
 
 #
 # Waveform Window Links

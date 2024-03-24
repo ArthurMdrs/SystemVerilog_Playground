@@ -31,10 +31,11 @@ ima_adpcm_decoder #(
 // Simulation variables
 int n_mismatches;
 bit verbose = 0;
+int max_samples = 1000;
 bit [15:0] orig_data [];
 bit [ 3:0] enc_data [];
 bit [15:0] dec_data [];
-logic [15:0] refmod_data;
+bit [15:0] refmod_data [3];
 
 // Clock 
 localparam int PERIOD = 2;
@@ -104,28 +105,36 @@ task drive_pkt (bit [3:0] data []);
         $finish;
     end
     
+    refmod_data = '{default:'0};
+    
     @ (negedge clk) ;
     sop = 1;
     eop = 0;
     coded_i = data[0];
-    refmod_data = refmod(coded_i);
+    refmod_data[0] = refmod(coded_i);
     
     for (int i = 1 ; i < data.size()-1 ; i++) begin
         @ (negedge clk) ;
         sop = 0;
         coded_i = data[i];
-        refmod_data = refmod(coded_i);
+        refmod_data = {refmod(coded_i), refmod_data[0], refmod_data[1]};
         // if (idx < 20)
         //     $display("%t: Expected = %4h. Actual = %4h.", $time, orig_data[idx], decoded_o);
         // idx++;
-        if (i < 20)
-            $display("%t: Expected = %4h. Actual = %4h.", $time, orig_data[i-1], decoded_o);
+        // if (i < 20)
+        //     $display("%t: Expected = %4h. Actual = %4h.", $time, orig_data[i-1], decoded_o);
+        if (refmod_data[2] != decoded_o) begin
+            $display("%t: Refmod = %4h. Dut = %4h.", $time, refmod_data[2], decoded_o);
+            $display("%t: Difference = %0d. ", $time, $signed(refmod_data[2] - decoded_o));
+            // $display("%t: External decoder = %4h. ", $time, dec_data[i-1]);
+            n_mismatches++;
+        end
     end
     
     @ (negedge clk) ;
     eop = 1;
     coded_i = data[data.size()-1];
-    refmod_data = refmod(coded_i);
+    refmod_data = {refmod(coded_i), refmod_data[0], refmod_data[1]};
     
     @ (negedge clk) ;
     eop = 0;
@@ -145,23 +154,20 @@ task automatic read_file_16 (string file_name, ref bit [15:0] dest []);
         $finish;
     end
     
-    while (!$feof(fp)) begin
+    while (!$feof(fp) && idx < max_samples) begin
         my_char = $fgetc(fp);
         if (!toggle) begin
             data_read = new [data_read.size()+1] (data_read);
             data_read[idx][7:0] = my_char;
         end
-        // if (!$feof(fp)) begin
-        //     my_char = $fgetc(fp);
-        //     data_read[idx][15:8] = my_char;
-        // end
         else begin
             data_read[idx][15:8] = my_char;
-            idx++;   
+            idx++;
         end
         toggle = !toggle;
     end
     
+    $display("Size of data read from %s is %0d.", file_name, data_read.size());
     dest = data_read;
 endtask
 
@@ -178,7 +184,7 @@ task automatic read_file_4 (string file_name, ref bit [3:0] dest []);
         $finish;
     end
     
-    while (!$feof(fp)) begin
+    while (!$feof(fp) && idx < max_samples) begin
         my_char = $fgetc(fp);
         data_read = new [data_read.size()+2] (data_read);
         data_read[idx] = my_char[3:0];
@@ -187,6 +193,7 @@ task automatic read_file_4 (string file_name, ref bit [3:0] dest []);
         idx++;
     end
     
+    $display("Size of data read from %s is %0d.", file_name, data_read.size());
     dest = data_read;
 endtask
 
@@ -199,13 +206,13 @@ int ima_index_table [16] = '{
 };
 int ima_step_table [89] = '{ 
         7,     8,     9,    10,    11,    12,    13,    14,    16,    17, 
-        19,    21,    23,    25,    28,    31,    34,    37,    41,    45, 
-        50,    55,    60,    66,    73,    80,    88,    97,   107,   118, 
-        130,   143,   157,   173,   190,   209,   230,   253,   279,   307,
-        337,   371,   408,   449,   494,   544,   598,   658,   724,   796,
-        876,   963,  1060,  1166,  1282,  1411,  1552,  1707,  1878,  2066, 
-        2272,  2499,  2749,  3024,  3327,  3660,  4026,  4428,  4871,  5358,
-        5894,  6484,  7132,  7845,  8630,  9493, 10442, 11487, 12635, 13899, 
+       19,    21,    23,    25,    28,    31,    34,    37,    41,    45, 
+       50,    55,    60,    66,    73,    80,    88,    97,   107,   118, 
+      130,   143,   157,   173,   190,   209,   230,   253,   279,   307,
+      337,   371,   408,   449,   494,   544,   598,   658,   724,   796,
+      876,   963,  1060,  1166,  1282,  1411,  1552,  1707,  1878,  2066, 
+     2272,  2499,  2749,  3024,  3327,  3660,  4026,  4428,  4871,  5358,
+     5894,  6484,  7132,  7845,  8630,  9493, 10442, 11487, 12635, 13899, 
     15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767 
 };
 int predictor  = 0;

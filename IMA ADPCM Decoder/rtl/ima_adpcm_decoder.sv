@@ -101,25 +101,27 @@ module ima_adpcm_decoder #(
         //     diff += (step >> 2);
         // if (coded_i_buf[3])
         //     diff = -diff;
-            
+        
+        // Do the calculations with everything multiplied by 8
         logic [19:0] diff_big;
-        diff_big = step;
+        diff_big = 0;
         if (coded_i_buf[2])
             diff_big += (step << 3);
         if (coded_i_buf[1])
             diff_big += (step << 2);
         if (coded_i_buf[0])
             diff_big += (step << 1);  
-        // // Rounding: up if >= .5, down if < .5
-        // // diff_big = diff_big + {16'b0, diff_big[2], 3'b0};      
         // Account for signal
         if (coded_i_buf[3])
-            diff_big = -diff_big;       
+            diff_big = -diff_big;
+        // Add step
+        diff_big += step;
+        // Round if negative
+        if (coded_i_buf[3])
+            diff_big += {16'b0, diff_big[2], 3'b0};
         // Divide by 8
         diff = diff_big >> 3;
-        
-        // if (coded_i_buf[3])
-        //     diff = -diff;
+        // diff = (diff_big + step)>> 3;
     end
     
     // Drive output 
@@ -131,3 +133,6 @@ endmodule
         // // if (diff_big[2] == 1'b1)
         // //     diff_big = diff_big + 20'b01000; 
         // // diff_big = diff_big + {16'b0, diff_big[2], 3'b0};
+        
+        // Rounding: up if >= .5, down if < .5
+        // diff_big = diff_big + {16'b0, diff_big[2], 3'b0};

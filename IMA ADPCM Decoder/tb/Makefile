@@ -18,5 +18,5 @@ gui:
 		 -gui -input simvision.tcl
 
 clean:
-	rm -rf xcelium.d INCA_libs xrun.* *.shm *.dsn *.trn *.ucm ncvlog_*.err imc.key .simvision jgproject
-	rm -r  mapped* rc* fv libscore_work script *.log *.history log/* png/* *.diag *.so *.sig~
+	@rm -rf xcelium.d INCA_libs xrun.* *.shm *.dsn *.trn *.ucm ncvlog_*.err imc.key .simvision jgproject 2> /dev/null || true
+	@rm -rf mapped* rc* fv libscore_work script *.log *.history log/* png/* *.diag *.so *.sig~ 2> /dev/null || true
